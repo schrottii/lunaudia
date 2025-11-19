@@ -2,8 +2,119 @@
 const { app, BrowserWindow, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const mm = require("music-metadata");
+
+global.shared = {};
 
 let mainWindow;
+let isDebug = false;
+
+global.shared.getMetadata = async (filePath, fileName) => {
+    if (!fs.existsSync(filePath)) {
+        console.log(filePath);
+        return false;
+    }
+
+    try {
+        const metadata = await mm.parseFile(path.join(filePath, fileName));
+        return metadata;
+    } catch (err) {
+        console.error(filePath + ", " + fileName);
+        console.error("Metadata error:", err);
+        //throw err;
+        return undefined;
+    }
+};
+
+const folderPathAudio = isDebug
+    ? path.join(__dirname, "audio")
+    : path.join(path.dirname(process.execPath.replace(/\\[^\\]+$/, "")), "audio");
+const folderPathStorage = isDebug
+    ? path.join(__dirname, "storage")
+    : path.join(path.dirname(process.execPath.replace(/\\[^\\]+$/, "")), "storage");
+
+global.shared.folderPathAudio = folderPathAudio;
+global.shared.folderPathStorage = folderPathStorage;
+
+var audioFolders = [
+    folderPathAudio,
+    path.join(process.env.USERPROFILE || "", "Music"),
+];
+
+const allowedAudioExtensions = [".mp3", ".ogg", ".wav", ".flac", ".m4a"];
+const allowedImageExtensions = [".png", ".jpg"];
+
+function getSubfolders(folder, allowedExtensions) {
+    if (!fs.existsSync(folder)) return [];
+
+    let results = [];
+    let entries = fs.readdirSync(folder);
+    let fullPath;
+    let stat;
+
+    for (let entry of entries) {
+        fullPath = path.join(folder, entry);
+        stat = fs.statSync(fullPath);
+
+        if (stat.isDirectory()) {
+            // folder (recursion, hell yeah)
+            results.push(...getSubfolders(fullPath, allowedExtensions));
+        }
+        else {
+            // file
+            if (allowedExtensions.includes(path.extname(entry).toLowerCase())) {
+                results.push(fullPath);
+            }
+        }
+    }
+
+    return results;
+}
+
+function getAudioFiles() {
+    let files = [];
+    let cover = [];
+
+    if (!fs.existsSync(folderPathAudio)) return []; // folder does not exist
+
+    // add folder-wide cover art
+    try {
+        cover = fs.readdirSync(folderPathAudio)
+            .filter(file => allowedImageExtensions.includes(path.extname(file).toLowerCase()))
+            .map(file => path.join(folderPathAudio, file));
+
+        if (cover.length > 0) {
+            let img = new Image();
+            img.src = cover[0];
+            img.onload = () => {
+                images["cover"] = img;
+            }
+        }
+        else {
+            images.cover = images.placeholderCover;
+        }
+    }
+    catch (err) {
+        console.error("Error reading image folder:", err);
+    }
+
+    // add audio files
+    let found;
+    for (let folder of audioFolders) {
+        if (!folder || !fs.existsSync(folder)) continue; // skip folder if faulty
+
+        try {
+            found = getSubfolders(folder, allowedAudioExtensions);
+            files.push(...found);
+        } catch (err) {
+            console.error("Error scanning folder:", folder, err);
+        }
+    }
+
+    return files;
+}
+
+
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -16,7 +127,7 @@ function createWindow() {
         }
     });
 
-    mainWindow.setMenuBarVisibility(false);
+    mainWindow.setMenuBarVisibility(isDebug);
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
 
     // open only http and https links in external browser
@@ -38,65 +149,17 @@ function createWindow() {
     // mainWindow.webContents.openDevTools();
 }
 
-// WGGJ
-images = {
-    bg: "bg.png",
-    icon: "icon.png",
-    button: "button.png",
-    placeholderCover: "placeholder_cover.png",
-    cover: "placeholder_cover.png",
-    bar: "colorful_bar.png",
-}
-wggjStartScene = "player";
-GAMENAME = "Lunaudia";
-FONT = "OpenSans";
-
-// Return an array of audio files
-var folderPath = path.join(__dirname, "../../../audio");
-const allowedExt = [".mp3", ".ogg", ".wav", ".flac", ".m4a"];
-const allowedImgExt = [".png", ".jpg"];
-
-function getAudioFiles() {
-    let files = [];
-    let cover = [];
-
-    try {
-        cover = fs.readdirSync(folderPath)
-            .filter(file => allowedImgExt.includes(path.extname(file).toLowerCase()))
-            .map(file => path.join(folderPath, file));
-
-        if (cover.length > 0) {
-            let img = new Image();
-            img.src = cover[0];
-            img.onload = () => {
-                images["cover"] = img;
-            }
-        }
-        else {
-            images.cover = images.placeholderCover;
-        }
-    }
-    catch (err) {
-        console.error("Error reading audio folder:", err);
-    }
-
-    try {
-        files = fs.readdirSync(folderPath)
-            .filter(file => allowedExt.includes(path.extname(file).toLowerCase()))
-            .map(file => path.join(folderPath, file));
-    } catch (err) {
-        console.error("Error reading audio folder:", err);
-    }
-
-    return files;
-}
-
-if (app.whenReady != undefined) app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+    //if (app.isPackaged) isDebug = true;
+    createWindow();
+});
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
 });
 
+/*
 app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
+*/

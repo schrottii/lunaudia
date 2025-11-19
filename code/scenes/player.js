@@ -2,15 +2,16 @@ var playlist = getAudioFiles();
 var playlistP = 0;
 var currentSong = "";
 var started = false;
+var timer = 0;
 
 wggjAudio.onended = () => {
     if (playlistP < playlist.length - 1) {
         nextSong();
-        updateMusic();
+        updatePlayingSong();
     }
     else {
         playlistP = 0;
-        updateMusic();
+        updatePlayingSong();
     }
 }
 
@@ -35,12 +36,19 @@ function nextSong() {
     }
 }
 
-function updateMusic() {
+function updatePlayingSong() {
     wggjAudio.currentTime = 0;
     currentSong = playlist[playlistP];
 
     wggjAudio.src = currentSong;
     wggjAudio.loop = repeat;
+
+    objects["metadataStatus"].power = false;
+    updateMusicMetadata();
+}
+
+function reloadAllSongs() {
+    playlist = getAudioFiles();
 }
 
 var repeat = false;
@@ -58,7 +66,7 @@ scenes["player"] = new Scene(
         createText("infoText3", 0.1, 0.25, "", { size: 24, color: "white", align: "left" });
         createText("infoText4", 0.1, 0.3, "", { size: 24, color: "white", align: "left" });
 
-        createImage("coverArt", 0.5, 0.25, 0.4, 0.4, "cover", { quadratic: true, centered: true });
+        createImage("metadataStatus", 0.1, 0.35, 0.05, 0.05, "metadata", { power: false, quadratic: true });
 
         createImage("progressBarBG", 0.2, 0.925, 0.6, 0.05, "bar");
         createSquare("progressBarHider", 0.2, 0.925, 0.6, 0.05, "pink");
@@ -66,16 +74,16 @@ scenes["player"] = new Scene(
         createButton("btnInfo", 0.95, 0.05, 0.1, 0.1, "button", () => {
             loadScene("info");
         }, { quadratic: true, centered: true });
-        createText("btnInfoText", 0.95, 0.125, "i", { size: 32, color: "white" });
+        createImage("btnInfoImg", 0.95, 0.05, 0.1, 0.1, "help", { quadratic: true, centered: true });
 
         // Bottom Buttons
         createButton("btnPrev", 0.3, 0.8, 0.1, 0.1, "button", () => {
             if (playlistP > 0) {
                 playlistP--;
-                updateMusic();
+                updatePlayingSong();
             }
         }, { quadratic: true, centered: true });
-        createText("btnPrevText", 0.3, 0.875, "<", { size: 32, color: "white" });
+        createImage("btnPrevImg", 0.3, 0.8, 0.1, 0.1, "previous", { quadratic: true, centered: true });
 
         createButton("btnPause", 0.5, 0.8, 0.1, 0.1, "button", () => {
             if (wggjAudio.paused) {
@@ -88,45 +96,77 @@ scenes["player"] = new Scene(
             }
             started = true;
         }, { quadratic: true, centered: true });
-        createText("btnPauseText", 0.5, 0.875, "II", { size: 32, color: "white" });
+        createImage("btnPauseImg", 0.5, 0.8, 0.1, 0.1, "pause", { quadratic: true, centered: true });
 
         createButton("btnNext", 0.7, 0.8, 0.1, 0.1, "button", () => {
             if (playlistP < playlist.length - 1 || shuffle) {
                 nextSong();
-                updateMusic();
+                updatePlayingSong();
             }
         }, { quadratic: true, centered: true });
-        createText("btnNextText", 0.7, 0.875, ">", { size: 32, color: "white" });
+        createImage("btnNextImg", 0.7, 0.8, 0.1, 0.1, "next", { quadratic: true, centered: true });
 
         createButton("btnRepeat", 0.1, 0.75, 0.08, 0.08, "button", () => {
             repeat = !repeat;
             wggjAudio.loop = repeat;
         }, { quadratic: true, centered: true });
-        createText("btnRepeatText", 0.1, 0.825, "Repeat", { size: 24, color: "white" });
+        createImage("btnRepeatImg", 0.1, 0.75, 0.1, 0.1, "repeat", { quadratic: true, centered: true });
 
         createButton("btnShuffle", 0.1, 0.55, 0.08, 0.08, "button", () => {
             shuffle = !shuffle;
         }, { quadratic: true, centered: true });
-        createText("btnShuffleText", 0.1, 0.625, "Shuffle", { size: 24, color: "white" });
+        createImage("btnShuffleImg", 0.1, 0.55, 0.1, 0.1, "shuffle", { quadratic: true, centered: true });
+
+        createButton("btnAddSource", 0.1, 0.35, 0.08, 0.08, "button", () => {
+            getNewPath();
+        }, { quadratic: true, centered: true });
+        createImage("btnAddSourceImg", 0.1, 0.35, 0.1, 0.1, "newfolder", { quadratic: true, centered: true });
+        createText("promptText", 0.108, 0.4, "", { size: 24, align: "left" });
+
+        // right side: volume selection
+        for (let i = 0; i < 11; i++) {
+            createButton("volumeB" + i, 0.925, 0.95 - 0.03 * i, 0.05, 0.028, "#FFFFFF", (c) => {
+                settings.volume = objects[c].config.i / 10;
+                wggjAudio.volume = settings.volume;
+                saveSettings(); // this is the only setting so far
+
+                for (let j = 0; j < 11; j++) {
+                    objects["volumeB" + j].color = j <= objects[c].config.i ? "#FFFFFF" : "#000000";
+                    objects["volumeText"].text = (settings.volume * 100) + "%";
+                }
+            }, { i: i });
+        }
+        createText("volumeText", 0.925 + 0.05 / 2, 0.95 - 0.03 * 11, "100%", { size: 40 });
+
+        createButton("coverArt", 0.5, 0.25, 0.4, 0.4, "placeholderCover", () => {
+            if (objects["coverArt"].h < 0.5) createAnimation("largerCover", "coverArt", (t, d, a) => { t.h = 0.4 + 0.6 * a.pct; t.y = 0.25 - 0.25 * a.pct; t.w = t.h; }, 1, true);
+            else createAnimation("smallerCover", "coverArt", (t, d, a) => { t.h = 1 - 0.6 * a.pct; t.y = 0.25 * a.pct; t.w = t.h; }, 1, true);
+        }, { quadratic: true, centered: true });
+
+        for (let j = 0; j < 11; j++) {
+            objects["volumeB" + j].color = j <= (settings.volume * 10) ? "#FFFFFF" : "#000000";
+            objects["volumeText"].text = (settings.volume * 100) + "%";
+        }
 
         // start, but not from another scene
-        if (currentSong == "") updateMusic();
+        if (currentSong == "") updatePlayingSong();
     },
     (tick) => {
         // Loop
-        objects["btnPauseText"].text = wggjAudio.paused ? "|>" : "II";
-
         objects["infoText1"].text = wggjAudio.paused ? "Paused" : "Running";
-        objects["infoText2"].text = "Track: " + currentSong.split("\\")[currentSong.split("\\").length - 1];
-        objects["infoText3"].text = wggjAudio.currentTime.toFixed(0) + "s / " + wggjAudio.duration.toFixed(0) + "s";
-        objects["infoText4"].text = "#" + (playlistP + 1) + " / #" + playlist.length;
+        if (playlist.length > 0) {
+            objects["infoText3"].text = wggjAudio.currentTime.toFixed(0) + "s / " + wggjAudio.duration.toFixed(0) + "s";
+            objects["infoText4"].text = "#" + (playlistP + 1) + " / #" + playlist.length;
+        }
 
         objects["progressBarHider"].w = 0.6 - (0.6 * (wggjAudio.currentTime / wggjAudio.duration));
         objects["progressBarHider"].x = 0.8 - objects["progressBarHider"].w;
 
-        objects["btnRepeatText"].color = repeat ? "lime" : "white";
-        objects["btnShuffleText"].color = shuffle ? "lime" : "white";
+        objects["btnPauseImg"].image = wggjAudio.paused ? "play" : "pause";
+        objects["btnRepeatImg"].image = repeat ? "repeat_on" : "repeat";
+        objects["btnShuffleImg"].image = shuffle ? "shuffle_on" : "shuffle";
 
-        //objects["coverArt"].source = images.cover;
+        timer = (timer + tick) % 1;
+        objects["promptText"].text = customPrompt.active ? (customPrompt.text + (timer > 0.5 ? "|" : "")) : "";
     }
 );

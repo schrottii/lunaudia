@@ -9,7 +9,7 @@ scenes["info"] = new Scene(
         createText("infoText2", 0.5, 0.2, "(Put your audio files in the 'audio' folder next to the .exe)", { size: 24, color: "white", align: "center" });
 
         createText("infoText3", 0.5, 0.3, "Made by Schrottii (c) 2025", { size: 24, color: "white", align: "center" });
-        createText("infoText4", 0.5, 0.35, "v1.1 2025-08-19", { size: 24, color: "white", align: "center" });
+        createText("infoText4", 0.5, 0.35, "v1.2 2025-11-19", { size: 24, color: "white", align: "center" });
 
         createButton("btn1", 0.3, 0.5, 0.4, 0.1, "button", () => {
             window.open("https://github.com/schrottii/lunaudia", "_blank");
@@ -19,7 +19,7 @@ scenes["info"] = new Scene(
         createButton("btn2", 0.7, 0.5, 0.4, 0.1, "button", () => {
             window.open("https://discord.gg/CbBeJXKUrk", "_blank");
         }, { quadratic: true, centered: true });
-        createText("btn2t", 0.8, 0.575, "Discord", { size: 40, color: "white" });
+        createText("btn2t", 0.7, 0.575, "Discord", { size: 40, color: "white" });
 
         createButton("btn3", 0.5, 0.65, 0.4, 0.1, "button", () => {
             window.open("https://ko-fi.com/schrottii", "_blank");

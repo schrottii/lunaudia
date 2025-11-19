@@ -10,6 +10,7 @@
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
+    "package-linux": "electron-packager . lunaudia --platform=linux --arch=x64 --out=out --overwrite",
     "make": "electron-forge make"
   },
   "author": "schrottii",
@@ -20,7 +21,7 @@
   "homepage": "https://github.com/schrottii/lunaudia#readme",
   "devDependencies": {
     "@electron-forge/cli": "^7.8.3",
-    "@electron-forge/maker-deb": "^7.8.3",
+    "@electron-forge/maker-deb": "^7.10.2",
     "@electron-forge/maker-rpm": "^7.8.3",
     "@electron-forge/maker-squirrel": "^7.8.3",
     "@electron-forge/maker-zip": "^7.8.3",
@@ -30,6 +31,7 @@
     "electron": "37.3.0"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "music-metadata": "^7.12.3"
   }
 }
