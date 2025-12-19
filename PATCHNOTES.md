@@ -55,3 +55,22 @@
 - It can now run when there is no audio folder or when it's empty
 - Album cover can now be clicked to enlargen it from 40% to 100%, and clicked again to go back to normal size
 - Updated WGGJ from v1.3 to v1.5.1
+
+
+
+## 1.3 (2025-12-19)
+-> Playlists:
+- Added the foundations of a library: Playlists!
+- Previously, you only had "one playlist" (with multiple paths, audio folder and Music folder by default), that is now the default playlist ("Local")
+- The button to add paths now leads to your Playlists instead
+- Here, you can see your Playlists (scrollable) and add as many as you want (no gurantee for performance at extreme amounts)
+- Click the button next to a cover to set it for the current playlist
+- You can select a playlist (to play it), edit its name, add a path or manage its paths
+- Manage Paths: change the path, remove it, or toggle if it scans subdirs (enabled by default)
+- This will be expanded in the future
+
+-> Other:
+- Added new images for: edit path, edit, delete, subdirs
+- Improved song UI loading
+- Player: Running is no longer shown, only Paused
+- Player: Adjusted size of playlists, shuffle and repeat images

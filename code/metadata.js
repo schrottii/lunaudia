@@ -1,11 +1,15 @@
 var currentMetadata = undefined;
 var imgBase64 = "";
 
-async function loadMetadata(filePath, fileName) {
+async function getMetadata(filePath, fileName = "") {
     let meta = await window.shared.getMetadata(filePath, fileName);
-    console.log(meta);
-    currentMetadata = meta;
-    return true;
+    //console.log(meta);
+    return meta;
+}
+
+async function loadMetadata(filePath, fileName = "") {
+    currentMetadata = await getMetadata(filePath, fileName);
+    return currentMetadata;
 }
 
 function base64ToImage(base64) {
@@ -14,8 +18,8 @@ function base64ToImage(base64) {
     return img;
 }
 
-function fetchSongData(type) {
-    let noMD = currentMetadata == undefined || currentMetadata.common == undefined || currentMetadata.common[type.toLowerCase()] == undefined;
+function fetchSongData(type, CMD = currentMetadata) {
+    let noMD = CMD == undefined || CMD.common == undefined || CMD.common[type.toLowerCase()] == undefined;
     switch (type) {
         case "title":
             if (currentSong == undefined) return "";
@@ -25,18 +29,18 @@ function fetchSongData(type) {
             if (noMD) return "";
             return " - " + searchSongData(type);
         case "picture":
-            if (noMD || currentMetadata.common.picture == undefined) return "cover";
-            let picture = currentMetadata.common.picture[0];
+            if (noMD || CMD.common.picture == undefined) return "cover";
+            let picture = CMD.common.picture[0];
             let mime = picture.format || "image/jpeg";
 
             imgBase64 = `data:${mime};base64,${picture.data.toString('base64')}`;
-            images["coverMD"] = base64ToImage(imgBase64);
-            return "coverMD";
+            images["cover_" + CMD.common.title] = base64ToImage(imgBase64);
+            return "cover_" + CMD.common.title;
     }
 }
 
-function searchSongData(type) {
-    let md = currentMetadata.common;
+function searchSongData(type, CMD = currentMetadata) {
+    let md = CMD.common;
 
     return md[type.toLowerCase()];
 }
@@ -51,12 +55,24 @@ function searchSongData(type) {
 }
 */
 
+async function getPlaylistCover(playlist = getPlaylist(settings.currentPlaylist)) {
+    let playlistCover = await getMetadata(playlist.imageSong);
+    playlistCover = fetchSongData("picture", playlistCover);
+    return playlistCover != undefined ? playlistCover : "cover";
+}
+
 async function updateMusicMetadata() {
     let loadedMD = await loadMetadata(currentSong, "");
 
     if (loadedMD) {
         objects["infoText2"].text = "Track: " + fetchSongData("title") + fetchSongData("artist");
-        objects["coverArt"].image = fetchSongData("picture");
+        
         if (currentMetadata != undefined && currentMetadata.common.title != undefined) objects["metadataStatus"].power = true;
     }
+
+    if (getPlaylist(settings.currentPlaylist).imageSong) {
+        objects["coverArt"].image = await getPlaylistCover();
+    }
+    else if (loadedMD) objects["coverArt"].image = fetchSongData("picture");
+    else objects["coverArt"].image = "cover";
 }

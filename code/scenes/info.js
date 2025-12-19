@@ -2,14 +2,14 @@ scenes["info"] = new Scene(
     () => {
         // Init
         createImage("bg", 0, 0, 1, 1, "bg");
-        createImage("icon", 0.02, 0.02, 0.1, 0.1, "icon", { quadratic: true });
+        createImage("icon", 0.01, 0.02, 0.08, 0.08, "icon", { quadratic: true });
         createText("header", 0.5, 0.1, "Lunaudia info", { size: 48, color: "white" });
 
         createText("infoText1", 0.5, 0.15, "Lunaudia is a simple local audio file player", { size: 24, color: "white", align: "center" });
-        createText("infoText2", 0.5, 0.2, "(Put your audio files in the 'audio' folder next to the .exe)", { size: 24, color: "white", align: "center" });
+        //createText("infoText2", 0.5, 0.2, "(Put your audio files in the 'audio' folder next to the .exe)", { size: 24, color: "white", align: "center" });
 
         createText("infoText3", 0.5, 0.3, "Made by Schrottii (c) 2025", { size: 24, color: "white", align: "center" });
-        createText("infoText4", 0.5, 0.35, "v1.2 2025-11-19", { size: 24, color: "white", align: "center" });
+        createText("infoText4", 0.5, 0.35, "v1.3 2025-12-19", { size: 24, color: "white", align: "center" });
 
         createButton("btn1", 0.3, 0.5, 0.4, 0.1, "button", () => {
             window.open("https://github.com/schrottii/lunaudia", "_blank");

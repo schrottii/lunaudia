@@ -9,9 +9,11 @@ global.shared = {};
 let mainWindow;
 let isDebug = false;
 
+global.shared.getSubdirsAllowed = () => { return false; }
+
 global.shared.getMetadata = async (filePath, fileName) => {
     if (!fs.existsSync(filePath)) {
-        console.log(filePath);
+        //console.log(filePath);
         return false;
     }
 
@@ -44,7 +46,7 @@ var audioFolders = [
 const allowedAudioExtensions = [".mp3", ".ogg", ".wav", ".flac", ".m4a"];
 const allowedImageExtensions = [".png", ".jpg"];
 
-function getSubfolders(folder, allowedExtensions) {
+function getSubfolders(folder, allowedExtensions, allowSub = true) {
     if (!fs.existsSync(folder)) return [];
 
     let results = [];
@@ -58,7 +60,7 @@ function getSubfolders(folder, allowedExtensions) {
 
         if (stat.isDirectory()) {
             // folder (recursion, hell yeah)
-            results.push(...getSubfolders(fullPath, allowedExtensions));
+            if (allowSub) results.push(...getSubfolders(fullPath, allowedExtensions, global.shared.getSubdirsAllowed(fullPath)));
         }
         else {
             // file
@@ -101,10 +103,11 @@ function getAudioFiles() {
     // add audio files
     let found;
     for (let folder of audioFolders) {
+        //console.log(folder, fs.existsSync(folder))
         if (!folder || !fs.existsSync(folder)) continue; // skip folder if faulty
 
         try {
-            found = getSubfolders(folder, allowedAudioExtensions);
+            found = getSubfolders(folder, allowedAudioExtensions, global.shared.getSubdirsAllowed(folder));
             files.push(...found);
         } catch (err) {
             console.error("Error scanning folder:", folder, err);

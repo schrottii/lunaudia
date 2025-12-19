@@ -16,7 +16,14 @@ wggjAudio.onended = () => {
 }
 
 wggjAudio.oncanplay = () => {
+    wggjAudio.volume = settings.volume;
     if (started) wggjAudio.play();
+}
+
+global.shared.getSubdirsAllowed = (path) => {
+    if (getPlaylist(settings.currentPlaylist).pathSettings == undefined) return true;
+    if (getPlaylist(settings.currentPlaylist).pathSettings[path] == undefined) return true;
+    return getPlaylist(settings.currentPlaylist).pathSettings[path].subdirs;
 }
 
 function nextSong() {
@@ -43,12 +50,22 @@ function updatePlayingSong() {
     wggjAudio.src = currentSong;
     wggjAudio.loop = repeat;
 
+    asyncLoader(["songUI"]);
+}
+
+async function updatePlayingSongUI() {
     objects["metadataStatus"].power = false;
-    updateMusicMetadata();
+    await updateMusicMetadata();
 }
 
 function reloadAllSongs() {
+    if (!getPlaylist(settings.currentPlaylist)) {
+        settings.currentPlaylist = playlists[0];
+    }
+
     playlist = getAudioFiles();
+    playlistP = 0;
+    asyncLoader(["songUI"]);
 }
 
 var repeat = false;
@@ -58,7 +75,7 @@ scenes["player"] = new Scene(
     () => {
         // Init
         createImage("bg", 0, 0, 1, 1, "bg");
-        createImage("icon", 0.02, 0.02, 0.1, 0.1, "icon", { quadratic: true });
+        createImage("icon", 0.01, 0.02, 0.08, 0.08, "icon", { quadratic: true });
         createText("header", 0.5, 0.1, "Lunaudia", { size: 48, color: "white" });
 
         createText("infoText1", 0.1, 0.15, "", { size: 24, color: "white", align: "left" });
@@ -86,6 +103,7 @@ scenes["player"] = new Scene(
         createImage("btnPrevImg", 0.3, 0.8, 0.1, 0.1, "previous", { quadratic: true, centered: true });
 
         createButton("btnPause", 0.5, 0.8, 0.1, 0.1, "button", () => {
+            wggjAudio.volume = settings.volume;
             if (wggjAudio.paused) {
                 wggjAudio.paused = false;
                 wggjAudio.play();
@@ -110,17 +128,18 @@ scenes["player"] = new Scene(
             repeat = !repeat;
             wggjAudio.loop = repeat;
         }, { quadratic: true, centered: true });
-        createImage("btnRepeatImg", 0.1, 0.75, 0.1, 0.1, "repeat", { quadratic: true, centered: true });
+        createImage("btnRepeatImg", 0.1, 0.75, 0.08, 0.08, "repeat", { quadratic: true, centered: true });
 
         createButton("btnShuffle", 0.1, 0.55, 0.08, 0.08, "button", () => {
             shuffle = !shuffle;
         }, { quadratic: true, centered: true });
-        createImage("btnShuffleImg", 0.1, 0.55, 0.1, 0.1, "shuffle", { quadratic: true, centered: true });
+        createImage("btnShuffleImg", 0.1, 0.55, 0.08, 0.08, "shuffle", { quadratic: true, centered: true });
 
         createButton("btnAddSource", 0.1, 0.35, 0.08, 0.08, "button", () => {
-            getNewPath();
+            //getNewPath();
+            loadScene("playlists");
         }, { quadratic: true, centered: true });
-        createImage("btnAddSourceImg", 0.1, 0.35, 0.1, 0.1, "newfolder", { quadratic: true, centered: true });
+        createImage("btnAddSourceImg", 0.1, 0.35, 0.08, 0.08, "folders", { quadratic: true, centered: true });
         createText("promptText", 0.108, 0.4, "", { size: 24, align: "left" });
 
         // right side: volume selection
@@ -143,6 +162,10 @@ scenes["player"] = new Scene(
             else createAnimation("smallerCover", "coverArt", (t, d, a) => { t.h = 1 - 0.6 * a.pct; t.y = 0.25 * a.pct; t.w = t.h; }, 1, true);
         }, { quadratic: true, centered: true });
 
+        createButton("coverArtSet", 0.7, 0.25, 0.05, 0.05, "play", () => {
+            getPlaylist(settings.currentPlaylist).imageSong = currentSong;
+        }, { quadratic: true });
+
         for (let j = 0; j < 11; j++) {
             objects["volumeB" + j].color = j <= (settings.volume * 10) ? "#FFFFFF" : "#000000";
             objects["volumeText"].text = (settings.volume * 100) + "%";
@@ -150,10 +173,11 @@ scenes["player"] = new Scene(
 
         // start, but not from another scene
         if (currentSong == "") updatePlayingSong();
+        else asyncLoader(["songUI"]);
     },
     (tick) => {
         // Loop
-        objects["infoText1"].text = wggjAudio.paused ? "Paused" : "Running";
+        objects["infoText1"].text = wggjAudio.paused ? "Paused" : "";
         if (playlist.length > 0) {
             objects["infoText3"].text = wggjAudio.currentTime.toFixed(0) + "s / " + wggjAudio.duration.toFixed(0) + "s";
             objects["infoText4"].text = "#" + (playlistP + 1) + " / #" + playlist.length;
