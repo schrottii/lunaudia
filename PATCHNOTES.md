@@ -81,3 +81,7 @@
 -> Volume Selection:
 - Changed from 11 steps to 21 (0%, 5%, 10%,... from 0%, 10%, 20%,...)
 - Can now be held
+
+-> Other:
+- App title updates to the current playing song
+- When paused, it returns to "Lunaudia" for privacy reasons

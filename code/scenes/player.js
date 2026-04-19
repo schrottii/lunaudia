@@ -55,6 +55,7 @@ function updatePlayingSong() {
 
 async function updatePlayingSongUI() {
     objects["metadataStatus"].power = false;
+    document.title = "Lunaudia";
     await updateMusicMetadata();
 }
 
@@ -126,6 +127,7 @@ scenes["player"] = new Scene(
             else {
                 wggjAudio.paused = true;
                 wggjAudio.pause();
+                document.title = "Lunaudia";
             }
             started = true;
         }, { quadratic: true, centered: true });
@@ -188,6 +190,10 @@ scenes["player"] = new Scene(
         if (playlist.length > 0) {
             objects["infoText3"].text = wggjAudio.currentTime.toFixed(0) + "s / " + wggjAudio.duration.toFixed(0) + "s";
             objects["infoText4"].text = "#" + (playlistP + 1) + " / #" + playlist.length;
+        }
+
+        if (document.title === "Lunaudia" && !wggjAudio.paused) {
+            document.title = currentSong !== "" && objects["infoText2"].text != "" ? objects["infoText2"].text.split(": ")[1] : "Lunaudia";
         }
 
         objects["progressBarHider"].w = 0.6 - (0.6 * (wggjAudio.currentTime / wggjAudio.duration));

@@ -8,8 +8,8 @@ scenes["info"] = new Scene(
         createText("infoText1", 0.5, 0.15, "Lunaudia is a simple local audio file player", { size: 24, color: "white", align: "center" });
         //createText("infoText2", 0.5, 0.2, "(Put your audio files in the 'audio' folder next to the .exe)", { size: 24, color: "white", align: "center" });
 
-        createText("infoText3", 0.5, 0.3, "Made by Schrottii (c) 2025", { size: 24, color: "white", align: "center" });
-        createText("infoText4", 0.5, 0.35, "v1.3 2025-12-19", { size: 24, color: "white", align: "center" });
+        createText("infoText3", 0.5, 0.3, "Made by Schrottii / Balnoom (c) 2025 - 2026", { size: 24, color: "white", align: "center" });
+        createText("infoText4", 0.5, 0.35, "v1.4 WIP", { size: 24, color: "white", align: "center" });
 
         createButton("btn1", 0.3, 0.5, 0.4, 0.1, "button", () => {
             window.open("https://github.com/schrottii/lunaudia", "_blank");
