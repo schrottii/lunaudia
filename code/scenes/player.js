@@ -68,6 +68,21 @@ function reloadAllSongs() {
     asyncLoader(["songUI"]);
 }
 
+function volumeSelection(c) {
+    settings.volume = objects[c].config.i / 20;
+    wggjAudio.volume = settings.volume;
+    saveSettings(); // this is the only setting so far
+
+    volumeSelectionUpdate();
+}
+
+function volumeSelectionUpdate() {
+    for (let j = 0; j < 21; j++) {
+        objects["volumeB" + j].color = j <= (settings.volume * 20) ? "#FFFFFF" : "#000000";
+        objects["volumeText"].text = (settings.volume * 100).toFixed(0) + "%";
+    }
+}
+
 var repeat = false;
 var shuffle = false;
 
@@ -143,18 +158,13 @@ scenes["player"] = new Scene(
         createText("promptText", 0.108, 0.4, "", { size: 24, align: "left" });
 
         // right side: volume selection
-        for (let i = 0; i < 11; i++) {
-            createButton("volumeB" + i, 0.925, 0.95 - 0.03 * i, 0.05, 0.028, "#FFFFFF", (c) => {
-                settings.volume = objects[c].config.i / 10;
-                wggjAudio.volume = settings.volume;
-                saveSettings(); // this is the only setting so far
-
-                for (let j = 0; j < 11; j++) {
-                    objects["volumeB" + j].color = j <= objects[c].config.i ? "#FFFFFF" : "#000000";
-                    objects["volumeText"].text = (settings.volume * 100) + "%";
-                }
-            }, { i: i });
+        for (let i = 0; i < 21; i++) {
+            createButton("volumeB" + i, 0.925, 0.95 - 0.015 * i, 0.05, 0.014, "#FFFFFF", (c) => volumeSelection(c), {
+                i: i
+            });
+            objects["volumeB" + i].onHold = (c) => volumeSelection(c);
         }
+        
         createText("volumeText", 0.925 + 0.05 / 2, 0.95 - 0.03 * 11, "100%", { size: 40 });
 
         createButton("coverArt", 0.5, 0.25, 0.4, 0.4, "placeholderCover", () => {
@@ -166,10 +176,7 @@ scenes["player"] = new Scene(
             getPlaylist(settings.currentPlaylist).imageSong = currentSong;
         }, { quadratic: true });
 
-        for (let j = 0; j < 11; j++) {
-            objects["volumeB" + j].color = j <= (settings.volume * 10) ? "#FFFFFF" : "#000000";
-            objects["volumeText"].text = (settings.volume * 100) + "%";
-        }
+        volumeSelectionUpdate();
 
         // start, but not from another scene
         if (currentSong == "") updatePlayingSong();
@@ -185,6 +192,7 @@ scenes["player"] = new Scene(
 
         objects["progressBarHider"].w = 0.6 - (0.6 * (wggjAudio.currentTime / wggjAudio.duration));
         objects["progressBarHider"].x = 0.8 - objects["progressBarHider"].w;
+        //objects["progressBarHider"].w += (objects["progressBarHider"].w + objects["progressBarHider"].x) % 0.8;
 
         objects["btnPauseImg"].image = wggjAudio.paused ? "play" : "pause";
         objects["btnRepeatImg"].image = repeat ? "repeat_on" : "repeat";

@@ -74,3 +74,10 @@
 - Improved song UI loading
 - Player: Running is no longer shown, only Paused
 - Player: Adjusted size of playlists, shuffle and repeat images
+
+
+
+## v1.4 ()
+-> Volume Selection:
+- Changed from 11 steps to 21 (0%, 5%, 10%,... from 0%, 10%, 20%,...)
+- Can now be held
