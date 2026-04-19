@@ -43,8 +43,8 @@ var audioFolders = [
     path.join(process.env.USERPROFILE || "", "Music"),
 ];
 
-const allowedAudioExtensions = [".mp3", ".ogg", ".wav", ".flac", ".m4a"];
-const allowedImageExtensions = [".png", ".jpg"];
+const allowedAudioExtensions = [".mp3", ".flac", ".ogg", ".wav", ".m4a", ".aac", ".m4r", ".opus", ".webm"];
+const allowedImageExtensions = [".png", ".jpg", ".jpeg", ".jpe", ".jfif", ".exif", ".avif", ".gif", ".agif", ".bmp", ".dib", ".rle", ".tga"];
 
 function getSubfolders(folder, allowedExtensions, allowSub = true) {
     if (!fs.existsSync(folder)) return [];

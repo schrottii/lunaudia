@@ -78,6 +78,14 @@
 
 
 ## v1.4 ()
+-> Supported file formats: 
+- Added support for a lot more formats:
+- Audio: aac, m4r, opus, webm
+- Image: jpeg, jpe, jfif, exif, avif, gif, agif, bmp, dib, rle, tga
+- Already supported previously: 
+- Audio: mp3, flac, m4a, ogg, wav
+- Image: png, jpg
+
 -> Volume Selection:
 - Changed from 11 steps to 21 (0%, 5%, 10%,... from 0%, 10%, 20%,...)
 - Can now be held
