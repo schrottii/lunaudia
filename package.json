@@ -1,6 +1,6 @@
 {
   "name": "lunaudia",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Simple audio file player",
   "main": "code/main.js",
   "repository": {

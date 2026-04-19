@@ -7,7 +7,7 @@ const mm = require("music-metadata");
 global.shared = {};
 
 let mainWindow;
-let isDebug = false;
+let isDebug = true;
 
 global.shared.getSubdirsAllowed = () => { return false; }
 
@@ -123,7 +123,7 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1920,
         height: 960,
-        icon: "images/icon.ico",
+        icon: "assets/textures/icon/icon.ico",
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
