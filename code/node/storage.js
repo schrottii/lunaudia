@@ -84,5 +84,6 @@ module.exports = {
     loadPlaylists,
 
     folderPathAudio,
-    folderPathStorage
+    folderPathStorage,
+    isDebug
 };

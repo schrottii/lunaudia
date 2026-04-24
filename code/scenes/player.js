@@ -67,6 +67,9 @@ async function updatePlayingSongUI() {
     }
     else document.title = "Lunaudia";
 
+    if (getPlaylist(settings.currentPlaylist).imageSong) objects["coverArtSet"].power = true;
+    else objects["coverArtSet"].power = false;
+
     await updateMusicMetadata();
 }
 
@@ -106,8 +109,11 @@ scenes["player"] = new Scene(
     () => {
         // Init
         createImage("bg", 0, 0, 1, 1, "bg");
-        createImage("icon", 0.01, 0.02, 0.08, 0.08, "icon", { quadratic: true });
-        createText("header", 0.5, 0.1, "Lunaudia", { size: 48, color: "white" });
+
+        //createImage("icon", 0.01, 0.02, 0.08, 0.08, "icon", { quadratic: true });
+        //createText("header", 0.5, 0.1, "Lunaudia", { size: 48, color: "white" });
+        createSquare("topbar", 0, 0, 1, 0.08, "rgb(120, 0, 90)", { alpha: 0.5 });
+        createImage("logo", 0.5, 0, 0.3, 0.1, "lunaudia-wide-logo", { centered: true });
 
         createText("infoText1", 0.1, 0.15, "", { size: 24, color: "white", align: "left" });
         createText("infoText2", 0.1, 0.2, "", { size: 24, color: "white", align: "left" });
@@ -119,10 +125,10 @@ scenes["player"] = new Scene(
         createImage("progressBarBG", 0.2, 0.925, 0.6, 0.05, "bar");
         createSquare("progressBarHider", 0.2, 0.925, 0.6, 0.05, "pink");
 
-        createButton("btnInfo", 0.95, 0.05, 0.1, 0.1, "button", () => {
+        createButton("btnInfo", 0.925, 0, 0.1, 0.1, "button", () => {
             loadScene("info");
-        }, { quadratic: true, centered: true });
-        createImage("btnInfoImg", 0.95, 0.05, 0.1, 0.1, "help", { quadratic: true, centered: true });
+        }, { quadratic: true });
+        createImage("btnInfoImg", 0.925, 0, 0.1, 0.1, "help", { quadratic: true });
 
         // Bottom Buttons
         createButton("btnPrev", 0.3, 0.8, 0.1, 0.1, "button", () => {
@@ -174,6 +180,8 @@ scenes["player"] = new Scene(
         createImage("btnAddSourceImg", 0.1, 0.35, 0.08, 0.08, "folders", { quadratic: true, centered: true });
         createText("promptText", 0.108, 0.4, "", { size: 24, align: "left" });
 
+
+
         // right side: volume selection
         for (let i = 0; i < 21; i++) {
             createButton("volumeB" + i, 0.925, 0.95 - 0.015 * i, 0.05, 0.014, "#FFFFFF", (c) => volumeSelection(c), {
@@ -181,19 +189,23 @@ scenes["player"] = new Scene(
             });
             objects["volumeB" + i].onHold = (c) => volumeSelection(c);
         }
-        
         createText("volumeText", 0.925 + 0.05 / 2, 0.95 - 0.03 * 11, "100%", { size: 40 });
 
+        volumeSelectionUpdate();
+
+
+
+        // cover image
+        createButton("coverArtSet", 0.3, 0.2, 0.05, 0.05, "play", () => {
+            getPlaylist(settings.currentPlaylist).imageSong = currentSong;
+        }, { quadratic: true, power: false });
+
         createButton("coverArt", 0.5, 0.25, 0.4, 0.4, "placeholderCover", () => {
-            if (objects["coverArt"].h < 0.5) createAnimation("largerCover", "coverArt", (t, d, a) => { t.h = 0.4 + 0.6 * a.pct; t.y = 0.25 - 0.25 * a.pct; t.w = t.h; }, 1, true);
-            else createAnimation("smallerCover", "coverArt", (t, d, a) => { t.h = 1 - 0.6 * a.pct; t.y = 0.25 * a.pct; t.w = t.h; }, 1, true);
+            if (objects["coverArt"].h < 0.45) createAnimation("largerCover", "coverArt", (t, d, a) => { t.h = Math.min(1, 0.4 + 0.6 * a.pct); t.y = 0.25 - 0.25 * a.pct; t.w = t.h; }, 1, true);
+            else if (objects["coverArt"].h > 0.95) createAnimation("smallerCover", "coverArt", (t, d, a) => { t.h = Math.max(0.4, 1 - 0.6 * a.pct); t.y = 0.25 * a.pct; t.w = t.h; }, 1, true);
         }, { quadratic: true, centered: true });
 
-        createButton("coverArtSet", 0.7, 0.25, 0.05, 0.05, "play", () => {
-            getPlaylist(settings.currentPlaylist).imageSong = currentSong;
-        }, { quadratic: true });
 
-        volumeSelectionUpdate();
 
         // start, but not from another scene
         if (currentSong == "") updatePlayingSong();
@@ -203,7 +215,7 @@ scenes["player"] = new Scene(
         // Loop
         objects["infoText1"].text = wggjAudio.paused ? "Paused" : "";
         if (playlist.length > 0) {
-            objects["infoText3"].text = wggjAudio.currentTime.toFixed(0) + "s / " + wggjAudio.duration.toFixed(0) + "s";
+            objects["infoText3"].text = convertSeconds(wggjAudio.currentTime) + " / " + convertSeconds(wggjAudio.duration);
             objects["infoText4"].text = "#" + (playlistP + 1) + " / #" + playlist.length;
         }
 

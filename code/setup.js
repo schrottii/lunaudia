@@ -9,6 +9,7 @@ images = {
 
     // icon
     icon: "assets/textures/icon/icon.png",
+    "lunaudia-wide-logo": "assets/textures/icon/lunaudia-wide_extrawide.png",
 
     // gui
     "play": "assets/textures/gui/play.png",
@@ -106,6 +107,20 @@ async function getNewPath() {
     reloadAllSongs();
     window.lunaudiaAPI.savePaths();
     return newPath;
+}
+
+function convertSeconds(s) {
+    if (s == undefined || isNaN(s)) return "0:00";
+    s = Math.round(s);
+
+    if (s < 10) return "0:0" + s;
+    else if (s < 60) return "0:" + s;
+
+    let min = Math.floor(s / 60);
+    s -= min * 60;
+    if (("" + s).length == 1) s = "0" + s;
+
+    return min + ":" + s;
 }
 
 

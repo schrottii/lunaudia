@@ -102,5 +102,9 @@
 
 -> Other:
 - Changed default size from 1920x960 to 1280x720
+- Duration is now displayed in the 0:00 format rather than 0s
+- Replaced text at top with wide logo
+- Added colored bar to the top
+- Fixed being able to change the cover art's animation before it is finished
 - App title updates to the current playing song
 - When paused, it returns to "Lunaudia" for privacy reasons
