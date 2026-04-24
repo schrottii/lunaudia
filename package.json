@@ -2,7 +2,7 @@
   "name": "lunaudia",
   "version": "1.4.0",
   "description": "Simple audio file player",
-  "main": "code/main.js",
+  "main": "code/node/main.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/schrottii/lunaudia.git"
@@ -31,6 +31,7 @@
     "electron": "37.3.0"
   },
   "dependencies": {
+    "discord-rpc": "^4.0.1",
     "electron-squirrel-startup": "^1.0.1",
     "music-metadata": "^7.12.3"
   }

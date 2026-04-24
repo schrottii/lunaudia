@@ -1,3 +1,5 @@
+// this file is the equivalent to the usual main.js, as that name is taken by node here
+
 // WGGJ
 images = {
     // core
@@ -102,7 +104,7 @@ async function getNewPath() {
     //audioFolders.push(newPath);
 
     reloadAllSongs();
-    savePaths();
+    window.lunaudiaAPI.savePaths();
     return newPath;
 }
 
@@ -155,6 +157,38 @@ function updateListWindow(elements) {
     else objects["listContainer"].YScroll = true;
     objects["listContainer"].YLimit[1] = ((elements.length + 1) * objects["listContainer"].heightL) - 0.99;
 }
+
+
+
+window.lunaudiaAPI.onExecuteAction((data) => {
+    //console.log("call from backend: ", data.fun, data.data);
+
+    switch (data.fun) {
+        case "getSubdirsAllowed":
+            return getSubdirsAllowed(data.data);
+            break;
+        case "setCover":
+            console.log(data, data.data);
+            return setCover(data.data);
+            break;
+        case "setCoverPlaceHolder":
+            console.log("placeholder");
+            images.cover = images.placeholderCover;
+            break;
+    }
+});
+
+function setCover(src0) {
+    src0 = JSON.parse(src0);
+
+    let img = new Image();
+    img.src = src0;
+    img.onload = () => {
+        images["cover"] = img;
+    }
+}
+
+
 
 var asyncLoaders = [];
 

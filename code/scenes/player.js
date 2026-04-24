@@ -1,8 +1,11 @@
-var playlist = getAudioFiles();
+var playlist = [];
 var playlistP = 0;
 var currentSong = "";
 var started = false;
 var timer = 0;
+
+var repeat = false;
+var shuffle = false;
 
 wggjAudio.onended = () => {
     if (playlistP < playlist.length - 1) {
@@ -17,13 +20,8 @@ wggjAudio.onended = () => {
 
 wggjAudio.oncanplay = () => {
     wggjAudio.volume = settings.volume;
-    if (started) wggjAudio.play();
-}
-
-global.shared.getSubdirsAllowed = (path) => {
-    if (getPlaylist(settings.currentPlaylist).pathSettings == undefined) return true;
-    if (getPlaylist(settings.currentPlaylist).pathSettings[path] == undefined) return true;
-    return getPlaylist(settings.currentPlaylist).pathSettings[path].subdirs;
+    //console.log(wggjAudio);
+    if (started && wggjAudio.src != undefined) wggjAudio.play();
 }
 
 function nextSong() {
@@ -44,6 +42,8 @@ function nextSong() {
 }
 
 function updatePlayingSong() {
+    if (playlist[playlistP] === undefined) return false;
+
     wggjAudio.currentTime = 0;
     currentSong = playlist[playlistP];
 
@@ -55,24 +55,36 @@ function updatePlayingSong() {
 
 async function updatePlayingSongUI() {
     objects["metadataStatus"].power = false;
-    document.title = "Lunaudia";
+
+    let title = await fetchSongData("title");
+    let artist = await fetchSongData("artist");
+    window.lunaudiaAPI.updateDiscord(title, artist);
+    document.title = title;
+
     await updateMusicMetadata();
 }
 
-function reloadAllSongs() {
+async function reloadAllSongs() {
     if (!getPlaylist(settings.currentPlaylist)) {
         settings.currentPlaylist = playlists[0];
     }
 
-    playlist = getAudioFiles();
-    playlistP = 0;
+    //console.log(audioFolders);
+    
+    let playlistLoad = await window.lunaudiaAPI.getAudioFiles(JSON.stringify(audioFolders));
+    //console.log("the load: " + playlistLoad);
+    playlist = JSON.parse(playlistLoad);
+    //console.log(playlist);
+
+    playlistP = 0; // set to first song in playlist
+    updatePlayingSong();
     asyncLoader(["songUI"]);
 }
 
 function volumeSelection(c) {
     settings.volume = objects[c].config.i / 20;
     wggjAudio.volume = settings.volume;
-    saveSettings(); // this is the only setting so far
+    window.lunaudiaAPI.saveSettings(settings);
 
     volumeSelectionUpdate();
 }
@@ -83,9 +95,6 @@ function volumeSelectionUpdate() {
         objects["volumeText"].text = (settings.volume * 100).toFixed(0) + "%";
     }
 }
-
-var repeat = false;
-var shuffle = false;
 
 scenes["player"] = new Scene(
     () => {

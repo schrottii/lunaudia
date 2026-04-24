@@ -90,6 +90,12 @@
 - Changed from 11 steps to 21 (0%, 5%, 10%,... from 0%, 10%, 20%,...)
 - Can now be held
 
+-> Internal:
+- Reworked node-related code, strictly seperating it from the front-end, which leads to 
+- Improved security
+- Code improvements
+- File tree rework
+
 -> Other:
 - App title updates to the current playing song
 - When paused, it returns to "Lunaudia" for privacy reasons

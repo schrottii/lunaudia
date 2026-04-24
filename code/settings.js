@@ -1,82 +1,41 @@
-//const path = require("path");
-//const fs = require("fs");
-
 var settings = {
     volume: 0.5,
     currentPlaylist: "",
 }
 
-function createStorage() {
-    let folderPathStorage = global.shared.folderPathStorage;
-    let folderPathAudio = global.shared.folderPathAudio;
+var audioFolders = [];
 
-    if (!fs.existsSync(folderPathAudio)) {
-        fs.mkdir(folderPathAudio, () => { });
+function getSubdirsAllowed(path) {
+    if (getPlaylist(settings.currentPlaylist).pathSettings == undefined) return true;
+    if (getPlaylist(settings.currentPlaylist).pathSettings[path] == undefined) return true;
+    return getPlaylist(settings.currentPlaylist).pathSettings[path].subdirs;
+}
+
+window.lunaudiaAPI.createStorage(settings);
+async function loadData() {
+    console.log(audioFolders);
+    audioFolders[0] = await window.lunaudiaAPI.getFolderPathAudio();
+    audioFolders[1] = await window.lunaudiaAPI.pathome("Music");
+    console.log(audioFolders);
+    /*
+    let pathLoader = await window.lunaudiaAPI.loadPaths();
+    if (pathLoader !== false && pathLoader !== undefined) {
+        audioFolders = pathLoader;
+        console.log(audioFolders);
     }
-    if (!fs.existsSync(folderPathStorage)) {
-        fs.mkdir(folderPathStorage, () => { });
-    }
+    console.log(audioFolders);
+    */
 
-    if (!fs.existsSync(path.join(folderPathStorage, "settings.json"))) {
-        saveSettings();
-    }
+    console.log(playlists, playlist);
 
-    if (!fs.existsSync(path.join(folderPathStorage, "paths.json"))) {
-        savePaths();
-    }
+    let loadedPlaylists = await window.lunaudiaAPI.loadPlaylists(JSON.stringify(playlists));
+    console.log(loadedPlaylists);
+    loadedPlaylists = JSON.parse(loadedPlaylists);
+    playlists = loadedPlaylists.map(p => new Playlist(p.type, p.name, p.songs, p.other));
+    console.log(playlists, playlist);
+
+    let loadedFiles = await window.lunaudiaAPI.getAudioFiles(JSON.stringify(audioFolders));
+    playlist = loadedFiles;
+    console.log(playlists, playlist);
 }
-
-function savePaths() {
-    let folderPathStorage = global.shared.folderPathStorage;
-
-    fs.writeFile(path.join(folderPathStorage, "paths.json"), JSON.stringify(audioFolders, null, 2), () => { });
-}
-
-function loadPaths() {
-    let folderPathStorage = global.shared.folderPathStorage;
-    if (!fs.existsSync(path.join(folderPathStorage, "paths.json"))) return false;
-    fs.readFile(path.join(folderPathStorage, "paths.json"), "utf-8", (err, data) => { audioFolders = JSON.parse(data); });
-}
-
-function saveSettings() {
-    let folderPathStorage = global.shared.folderPathStorage;
-
-    fs.writeFile(path.join(folderPathStorage, "settings.json"), JSON.stringify(settings, null, 2), () => { });
-}
-
-function loadSettings() {
-    let folderPathStorage = global.shared.folderPathStorage;
-    if (!fs.existsSync(path.join(folderPathStorage, "settings.json"))) return false;
-    fs.readFile(path.join(folderPathStorage, "settings.json"), "utf-8", (err, data) => { settings = JSON.parse(data); });
-
-    wggjAudio.volume = settings.volume;
-}
-
-function savePlaylists() {
-    let folderPathStorage = global.shared.folderPathStorage;
-
-    fs.writeFile(path.join(folderPathStorage, "playlists.json"), JSON.stringify(playlists, null, 2), () => { });
-}
-
-function loadPlaylists() {
-    let folderPathStorage = global.shared.folderPathStorage;
-    if (!fs.existsSync(path.join(folderPathStorage, "playlists.json"))) {
-        savePlaylists();
-        return false;
-    }
-    fs.readFile(path.join(folderPathStorage, "playlists.json"), "utf-8", (err, data) => {
-        let rawPlaylists = JSON.parse(data);
-        let rp;
-        playlists = [];
-        for (let r in rawPlaylists) {
-            rp = rawPlaylists[r];
-            playlists.push(new Playlist(rp.type, rp.name, [], rp));
-            playlists[playlists.length - 1].getImage();
-        }
-    });
-}
-
-createStorage();
-loadPaths();
-loadSettings();
-loadPlaylists();
+loadData();
