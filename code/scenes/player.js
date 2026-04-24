@@ -62,7 +62,10 @@ async function updatePlayingSongUI() {
     let discordReturn = await window.lunaudiaAPI.updateDiscord(title, artist);
     console.log(discordReturn);
 
-    document.title = title;
+    if (title.length > 2) {
+        document.title = title;
+    }
+    else document.title = "Lunaudia";
 
     await updateMusicMetadata();
 }
@@ -204,9 +207,9 @@ scenes["player"] = new Scene(
             objects["infoText4"].text = "#" + (playlistP + 1) + " / #" + playlist.length;
         }
 
-        if (document.title === "Lunaudia" && !wggjAudio.paused) {
-            document.title = currentSong !== "" && objects["infoText2"].text != "" ? objects["infoText2"].text.split(": ")[1] : "Lunaudia";
-        }
+        //if (document.title === "Lunaudia" && !wggjAudio.paused) {
+        //    document.title = currentSong !== "" && objects["infoText2"].text != "" ? objects["infoText2"].text.split(": ")[1] : "Lunaudia";
+        //}
 
         objects["progressBarHider"].w = 0.6 - (0.6 * (wggjAudio.currentTime / wggjAudio.duration));
         objects["progressBarHider"].x = 0.8 - objects["progressBarHider"].w;
