@@ -168,11 +168,11 @@ window.lunaudiaAPI.onExecuteAction((data) => {
             return getSubdirsAllowed(data.data);
             break;
         case "setCover":
-            console.log(data, data.data);
+            //console.log(data, data.data);
             return setCover(data.data);
             break;
         case "setCoverPlaceHolder":
-            console.log("placeholder");
+            //console.log("placeholder");
             images.cover = images.placeholderCover;
             break;
     }

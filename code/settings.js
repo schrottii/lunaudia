@@ -13,10 +13,11 @@ function getSubdirsAllowed(path) {
 
 window.lunaudiaAPI.createStorage(settings);
 async function loadData() {
-    console.log(audioFolders);
+    //console.log(audioFolders);
     audioFolders[0] = await window.lunaudiaAPI.getFolderPathAudio();
     audioFolders[1] = await window.lunaudiaAPI.pathome("Music");
-    console.log(audioFolders);
+    //console.log(audioFolders);
+
     /*
     let pathLoader = await window.lunaudiaAPI.loadPaths();
     if (pathLoader !== false && pathLoader !== undefined) {
@@ -26,16 +27,16 @@ async function loadData() {
     console.log(audioFolders);
     */
 
-    console.log(playlists, playlist);
+    //console.log(playlists, playlist);
 
     let loadedPlaylists = await window.lunaudiaAPI.loadPlaylists(JSON.stringify(playlists));
-    console.log(loadedPlaylists);
+    //console.log(loadedPlaylists);
     loadedPlaylists = JSON.parse(loadedPlaylists);
     playlists = loadedPlaylists.map(p => new Playlist(p.type, p.name, p.songs, p.other));
-    console.log(playlists, playlist);
+    //console.log(playlists, playlist);
 
     let loadedFiles = await window.lunaudiaAPI.getAudioFiles(JSON.stringify(audioFolders));
     playlist = loadedFiles;
-    console.log(playlists, playlist);
+    //console.log(playlists, playlist);
 }
 loadData();

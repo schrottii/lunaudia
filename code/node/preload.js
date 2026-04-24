@@ -1,11 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-/*
-const { updateDiscordPresence } = require('./discord');
-const { pathome, getAudioFiles, loadMetadata } = require('./main');
-const { saveSettings, createStorage, savePaths, loadPaths, savePlaylists, loadPlaylists, folderPathAudio } = require('./storage');
-*/
-
 contextBridge.exposeInMainWorld('lunaudiaAPI', {
     // new
     updateDiscord: (song = "", artist = "") => ipcRenderer.invoke('discord-update', song, artist),
@@ -27,25 +21,3 @@ contextBridge.exposeInMainWorld('lunaudiaAPI', {
     // other way around
     onExecuteAction: (callback) => ipcRenderer.on('execute-ui-action', (event, data) => callback(data))
 });
-
-/*
-contextBridge.exposeInMainWorld('lunaudiaAPI', {
-    // new functions
-    updateDiscord: (songName, artist) => updateDiscordPresence(songName, artist), // discord
-    pathome: (pp) => pathome(pp), // main
-
-    // shared functions
-    getAudioFiles: () => getAudioFiles(), // main
-    loadMetadata: (filePath, fileName = "") => loadMetadata(filePath, fileName),
-
-    saveSettings: (data) => saveSettings(data), // storage
-    createStorage: (data) => createStorage(data),
-    savePaths: (audioFolders) => savePaths(audioFolders),
-    loadPaths: () => loadPaths(),
-    savePlaylists: (playlists) => savePlaylists(playlists),
-    loadPlaylists: (playlists) => loadPlaylists(playlists),
-
-    // shared vars
-    folderPathAudio: folderPathAudio, // storage
-});
-*/

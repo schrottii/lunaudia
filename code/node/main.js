@@ -118,18 +118,12 @@ function getAudioFiles(audioFolders = "") {
                 .map(file => path.join(folderPathAudio, file));
 
             if (cover.length > 0) {
+                // custom cover art
                 contactFront("setCover", JSON.stringify(cover[0]));
-                /*
-                let img = new Image();
-                img.src = cover[0];
-                img.onload = () => {
-                    images["cover"] = img;
-                }
-                */
             }
             else {
+                // placeholder image
                 contactFront("setCoverPlaceHolder");
-                //images.cover = images.placeholderCover;
             }
         }
         catch (err) {
@@ -168,7 +162,7 @@ function createWindow() {
         }
     });
 
-    mainWindow.setMenuBarVisibility(true);// isDebug);
+    mainWindow.setMenuBarVisibility(isDebug);
     mainWindow.loadFile(path.join(__dirname, "../../index.html"));
 
     // open only http and https links in external browser
@@ -200,9 +194,3 @@ app.whenReady().then(async () => {
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
 });
-
-/*
-app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-});
-*/
