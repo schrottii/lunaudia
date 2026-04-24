@@ -58,7 +58,10 @@ async function updatePlayingSongUI() {
 
     let title = await fetchSongData("title");
     let artist = await fetchSongData("artist");
-    window.lunaudiaAPI.updateDiscord(title, artist);
+    console.log(title, artist);
+    let discordReturn = await window.lunaudiaAPI.updateDiscord(title, artist);
+    console.log(discordReturn);
+
     document.title = title;
 
     await updateMusicMetadata();

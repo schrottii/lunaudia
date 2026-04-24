@@ -8,7 +8,7 @@ const { saveSettings, createStorage, savePaths, loadPaths, savePlaylists, loadPl
 
 contextBridge.exposeInMainWorld('lunaudiaAPI', {
     // new
-    updateDiscord: (song = "", artist = "") => ipcRenderer.send('discord-update', song, artist),
+    updateDiscord: (song = "", artist = "") => ipcRenderer.invoke('discord-update', song, artist),
     pathome: (pp = "") => ipcRenderer.invoke('pathome', pp),
 
     // sharing functions

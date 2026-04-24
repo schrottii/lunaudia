@@ -78,6 +78,10 @@
 
 
 ## v1.4 ()
+-> Discord RPC:
+- Added support for Discord RPC
+- When you have Discord (& are not offline & don't have sharing activities disabled), Lunaudia will display with the current playing song and artist
+
 -> Supported file formats: 
 - Added support for a lot more formats:
 - Audio: aac, m4r, opus, webm

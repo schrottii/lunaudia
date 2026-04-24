@@ -15,22 +15,25 @@ function updateDiscordPresence(songName, artist) {
 
     if (!discordClient || !discordClient.user) {
         console.log("Discord not ready");
-        return false;
+        return "discord not ready";
     }
 
     discordClient.setActivity({
         details: `Listening to ${songName}`,
         state: `by ${artist}`,
-        startTimestamp: new Date(),
+        //startTimestamp: new Date(),
         largeImageKey: 'logo_key',
+        largeImageText: 'Lunaudia',
         instance: false
     }).catch(err => console.error("Update failed:", err));
     console.log("Discord written");
-    return true;
+    return "" + songName + " - " + artist;
+    //return true;
 }
 
 discordClient.on('ready', () => {
     console.log("ready...");
+    
     setTimeout(() => {
         discordClient.setActivity({
             details: 'Listening to music',

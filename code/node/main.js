@@ -35,8 +35,8 @@ ipcMain.handle('storage-action', async (event, action, data) => {
     }
 });
 
-ipcMain.handle('discord-update', async (event, data) => {
-    updateDiscordPresence(...data);
+ipcMain.handle('discord-update', async (event, song, artist) => {
+    return updateDiscordPresence(song, artist);
 });
 ipcMain.handle('get-folder-path-audio', async () => {
     return folderPathAudio;
