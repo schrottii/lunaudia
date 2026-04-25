@@ -106,6 +106,7 @@
 - Can now be held
 
 -> Other:
+- Playlists: added button to delete playlist
 - Changed default size from 1920x960 to 1280x720
 - App title updates to the current playing song
 - When paused, it returns to "Lunaudia" for privacy reasons

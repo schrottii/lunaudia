@@ -49,6 +49,18 @@ class Playlist {
         createImage(i + "_pathsImg", 0.7, y + 0.08, 0.1, 0.1, "editfolder", { quadratic: true, centered: true });
         createText(i + "_pathsTxt", 0.7, y + 0.08, "", { size: 24, color: "white" });
 
+        createButton(i + "_remove", 0.8, y + 0.08, 0.1, 0.1, "button", async () => {
+            let index = -1;
+            for (let p in playlists) {
+                if (playlists[p].name == this.name) index = p;
+            }
+            if (index === -1) return false;
+            playlists.splice(index, 1);
+            loadScene("playlists");
+        }, { quadratic: true, centered: true });
+        createImage(i + "_removeImg", 0.8, y + 0.08, 0.1, 0.1, "delete", { quadratic: true, centered: true });
+        createText(i + "_removeTxt", 0.8, y + 0.08, "Remove", { size: 24, color: "white" });
+
         return [
             i + "_name", i + "_sel",
             i + "_select", i + "_selectImg", i + "_selectTxt",
