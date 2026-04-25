@@ -1,29 +1,37 @@
+// this file is the equivalent to the usual main.js, as that name is taken by node here
+
 // WGGJ
 images = {
-    bg: "bg.png",
-    icon: "icon.png",
-    button: "button.png",
-    placeholderCover: "placeholder_cover.png",
-    bar: "colorful_bar.png",
+    // core
+    bg: "assets/textures/core/bg.png",
+    button: "assets/textures/core/button.png",
+    bar: "assets/textures/core/colorful_bar.png",
 
-    "play": "play.png",
-    "pause": "pause.png",
-    "previous": "previous.png",
-    "next": "next.png",
-    "shuffle": "shuffle.png",
-    "shuffle_on": "shuffle_on.png",
-    "repeat": "repeat.png",
-    "repeat_on": "repeat_on.png",
-    "help": "help.png",
-    "metadata": "metadata.png",
-    "newfolder": "newfolder.png",
-    "editfolder": "editfolder.png",
-    "edit": "edit.png",
-    "delete": "delete.png",
-    "folders": "folders.png",
+    // icon
+    icon: "assets/textures/icon/icon.png",
+    "lunaudia-wide-logo": "assets/textures/icon/lunaudia-wide_extrawide.png",
 
-    cover: "placeholder_cover.png",
-    coverMD: "placeholder_cover.png",
+    // gui
+    "play": "assets/textures/gui/play.png",
+    "pause": "assets/textures/gui/pause.png",
+    "previous": "assets/textures/gui/previous.png",
+    "next": "assets/textures/gui/next.png",
+    "shuffle": "assets/textures/gui/shuffle.png",
+    "shuffle_on": "assets/textures/gui/shuffle_on.png",
+    "repeat": "assets/textures/gui/repeat.png",
+    "repeat_on": "assets/textures/gui/repeat_on.png",
+    "help": "assets/textures/gui/help.png",
+    "metadata": "assets/textures/gui/metadata.png",
+    "newfolder": "assets/textures/gui/newfolder.png",
+    "editfolder": "assets/textures/gui/editfolder.png",
+    "edit": "assets/textures/gui/edit.png",
+    "delete": "assets/textures/gui/delete.png",
+    "folders": "assets/textures/gui/folders.png",
+
+    // cover
+    placeholderCover: "assets/textures/coverart/placeholder_cover.png",
+    cover: "assets/textures/coverart/placeholder_cover.png",
+    coverMD: "assets/textures/coverart/placeholder_cover.png",
 }
 
 wggj.config.startScene = "player";
@@ -97,8 +105,22 @@ async function getNewPath() {
     //audioFolders.push(newPath);
 
     reloadAllSongs();
-    savePaths();
+    window.lunaudiaAPI.savePaths(audioFolders);
     return newPath;
+}
+
+function convertSeconds(s) {
+    if (s == undefined || isNaN(s)) return "0:00";
+    s = Math.round(s);
+
+    if (s < 10) return "0:0" + s;
+    else if (s < 60) return "0:" + s;
+
+    let min = Math.floor(s / 60);
+    s -= min * 60;
+    if (("" + s).length == 1) s = "0" + s;
+
+    return min + ":" + s;
 }
 
 
@@ -150,6 +172,38 @@ function updateListWindow(elements) {
     else objects["listContainer"].YScroll = true;
     objects["listContainer"].YLimit[1] = ((elements.length + 1) * objects["listContainer"].heightL) - 0.99;
 }
+
+
+
+window.lunaudiaAPI.onExecuteAction((data) => {
+    //console.log("call from backend: ", data.fun, data.data);
+
+    switch (data.fun) {
+        case "getSubdirsAllowed":
+            return getSubdirsAllowed(data.data);
+            break;
+        case "setCover":
+            //console.log(data, data.data);
+            return setCover(data.data);
+            break;
+        case "setCoverPlaceHolder":
+            //console.log("placeholder");
+            images.cover = images.placeholderCover;
+            break;
+    }
+});
+
+function setCover(src0) {
+    src0 = JSON.parse(src0);
+
+    let img = new Image();
+    img.src = src0;
+    img.onload = () => {
+        images["cover"] = img;
+    }
+}
+
+
 
 var asyncLoaders = [];
 

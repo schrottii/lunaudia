@@ -1,10 +1,22 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
+/*
+,
+        "fileAssociation": [
+            {
+                "name": "Audio File",
+                "description": "Listen with Lunaudia",
+                "ext": ["mp3", "flac", "ogg", "wav", "m4a", "aac", "m4r", "opus", "webm"],
+                "role": "Viewer"
+            }
+        ]
+*/
+
 module.exports = {
     packagerConfig: {
         asar: true,
-        icon: 'images/icon',
+        icon: 'assets/textures/icon',
         "extraResources": [
             {
                 "from": "audio",

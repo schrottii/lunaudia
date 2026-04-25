@@ -12,9 +12,18 @@
     <audio id="wggjAudio" type="audio/ogg" preload="auto"></audio>
     <canvas id="wggjCanvas"></canvas>
 
+    <script>
+        document.addEventListener('error', function (e) {
+            if (e.target.tagName === 'IMG' || e.target.tagName === 'AUDIO') {
+                console.log('Error caused by:', e.target);
+                console.log('with path:', e.target.src);
+            }
+        }, true);
+    </script>
+
     <script src="code/libs/wggj.js"></script>
     <script src="code/setup.js"></script>
-    <script src="code/main.js"></script>
+    <script src="code/playlists.js"></script>
     <script src="code/metadata.js"></script>
     <script src="code/settings.js"></script>
 

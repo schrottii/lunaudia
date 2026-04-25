@@ -74,3 +74,40 @@
 - Improved song UI loading
 - Player: Running is no longer shown, only Paused
 - Player: Adjusted size of playlists, shuffle and repeat images
+
+
+
+## v1.4 (2026-04-25)
+-> Discord RPC:
+- Added support for Discord RPC
+- When you have Discord (& are not offline & don't have sharing activities disabled), Lunaudia will display with the current playing song and artist
+
+-> Supported file formats: 
+- Added support for a lot more formats:
+- Audio: aac, m4r, opus, webm
+- Image: jpeg, jpe, jfif, exif, avif, gif, agif, bmp, dib, rle, tga
+- Already supported previously: 
+- Audio: mp3, flac, m4a, ogg, wav
+- Image: png, jpg
+
+-> Internal:
+- Reworked node-related code, strictly seperating it from the front-end, which leads to 
+- Improved security
+- Code improvements
+- File tree rework
+
+-> Design:
+- Duration is now displayed in the 0:00 format rather than 0s
+- Replaced text at top with wide logo
+- Added colored bar to the top
+
+-> Volume Selection:
+- Changed from 11 steps to 21 (0%, 5%, 10%,... from 0%, 10%, 20%,...)
+- Can now be held
+
+-> Other:
+- Playlists: added button to delete playlist
+- Changed default size from 1920x960 to 1280x720
+- App title updates to the current playing song
+- When paused, it returns to "Lunaudia" for privacy reasons
+- Fixed being able to change the cover art's animation before it is finished

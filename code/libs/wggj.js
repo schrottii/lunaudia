@@ -158,7 +158,7 @@ var wggjLoadedAudio = 0;
 function wggjLoadImages() {
     for (let image in images) {
         let img = new Image();
-        img.src = "images/" + images[image];
+        img.src = "" + images[image]; // EDITED
         img.onload = () => {
             wggjLoadedImages++;
             if (wggjLoadingImages == wggjLoadedImages) {

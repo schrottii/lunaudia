@@ -1,8 +1,8 @@
 {
   "name": "lunaudia",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Simple audio file player",
-  "main": "code/main.js",
+  "main": "code/node/main.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/schrottii/lunaudia.git"
@@ -10,7 +10,8 @@
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "package-linux": "electron-packager . lunaudia --platform=linux --arch=x64 --out=out --overwrite",
+    "package-linux-x64": "electron-packager . lunaudia --platform=linux --arch=x64 --out=out --overwrite",
+    "package-linux-arm64": "electron-packager . lunaudia --platform=linux --arch=arm64 --out=out --overwrite",
     "make": "electron-forge make"
   },
   "author": "schrottii",
@@ -31,6 +32,7 @@
     "electron": "37.3.0"
   },
   "dependencies": {
+    "discord-rpc": "^4.0.1",
     "electron-squirrel-startup": "^1.0.1",
     "music-metadata": "^7.12.3"
   }
