@@ -10,7 +10,8 @@
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "package-linux": "electron-packager . lunaudia --platform=linux --arch=x64 --out=out --overwrite",
+    "package-linux-x64": "electron-packager . lunaudia --platform=linux --arch=x64 --out=out --overwrite",
+    "package-linux-arm64": "electron-packager . lunaudia --platform=linux --arch=arm64 --out=out --overwrite",
     "make": "electron-forge make"
   },
   "author": "schrottii",
