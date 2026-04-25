@@ -67,7 +67,7 @@ async function updatePlayingSongUI() {
     }
     else document.title = "Lunaudia";
 
-    if (getPlaylist(settings.currentPlaylist).imageSong) objects["coverArtSet"].power = true;
+    if (objects["coverArt"].image != "cover") objects["coverArtSet"].power = true;
     else objects["coverArtSet"].power = false;
 
     await updateMusicMetadata();
@@ -88,6 +88,8 @@ async function reloadAllSongs() {
     playlistP = 0; // set to first song in playlist
     updatePlayingSong();
     asyncLoader(["songUI"]);
+
+    return playlist.length;
 }
 
 function volumeSelection(c) {

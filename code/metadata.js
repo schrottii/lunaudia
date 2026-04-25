@@ -9,22 +9,36 @@ function base64ToImage(base64) {
 
 function fetchSongData(type, CMD = currentMetadata) {
     let noMD = CMD == undefined || CMD.common == undefined || CMD.common[type.toLowerCase()] == undefined;
+    console.log("no: " + noMD + ", MD: ");
+    console.log(CMD);
+
     switch (type) {
         case "title":
             if (currentSong == undefined) return "";
             if (noMD) return currentSong.split("\\")[currentSong.split("\\").length - 1];
-            return searchSongData(type);
+            return searchSongData(type, CMD);
         case "artist":
             if (noMD) return "";
-            return " - " + searchSongData(type);
+            return " - " + searchSongData(type, CMD);
         case "picture":
             if (noMD || CMD.common.picture == undefined) return "cover";
-            let picture = CMD.common.picture[0];
-            let mime = picture.format || "image/jpeg";
+            try {
+                console.log(CMD.common);
+                let picture = CMD.common.picture[0];
+                let title = CMD.common.title;
 
-            imgBase64 = `data:${mime};base64,${picture.data.toString('base64')}`;
-            images["cover_" + CMD.common.title] = base64ToImage(imgBase64);
-            return "cover_" + CMD.common.title;
+                if (picture && picture.base64) {
+                    imgBase64 = `data:${picture.format};base64,${picture.base64}`;
+                    images["cover_" + title] = base64ToImage(imgBase64);
+                    return "cover_" + title;
+                } else {
+                    return "cover";
+                }
+            }
+            catch (e) {
+                console.log(e);
+                return "cover";
+            }
     }
 }
 
@@ -45,18 +59,24 @@ function searchSongData(type) {
 */
 
 async function getPlaylistCover(playlist = getPlaylist(settings.currentPlaylist)) {
-    let playlistCover = await window.lunaudiaAPI.loadMetadata(playlist.imageSong); // load or get ?
-    if (playlistCover === undefined) return undefined;
+    let metadata = await window.lunaudiaAPI.getMetadata(playlist.imageSong); // load or get ?
+    if (metadata === undefined || metadata === false) return "cover";
+    metadata = JSON.parse(metadata);
 
-    playlistCover = fetchSongData("picture", playlistCover);
+    console.log("metadata: " + metadata);
+
+    let playlistCover = fetchSongData("picture", metadata);
     return playlistCover != undefined ? playlistCover : "cover";
 }
 
 async function updateMusicMetadata() {
-    let loadedMD = await window.lunaudiaAPI.loadMetadata(currentSong, "");
+    let loadedMD = await window.lunaudiaAPI.getMetadata(currentSong, "");
+    if (loadedMD == undefined || loadedMD == false) return false;
+    loadedMD = JSON.parse(loadedMD);
+    console.log(loadedMD);
 
     if (loadedMD) {
-        objects["infoText2"].text = "Track: " + fetchSongData("title") + fetchSongData("artist");
+        objects["infoText2"].text = "Track: " + fetchSongData("title", loadedMD) + fetchSongData("artist", loadedMD);
         
         if (currentMetadata != undefined && currentMetadata.common.title != undefined) objects["metadataStatus"].power = true;
     }
@@ -65,6 +85,12 @@ async function updateMusicMetadata() {
         let loadedCoverArt = await getPlaylistCover();
         if (loadedCoverArt !== undefined) objects["coverArt"].image = loadedCoverArt;
     }
-    else if (loadedMD) objects["coverArt"].image = fetchSongData("picture");
-    else objects["coverArt"].image = "cover";
+    else if (loadedMD) {
+        console.log("trying to load the song's cover art");
+        objects["coverArt"].image = fetchSongData("picture", loadedMD);
+    }
+    else {
+        console.log("default cover");
+        objects["coverArt"].image = "cover";
+    }
 }

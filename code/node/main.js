@@ -12,12 +12,14 @@ function contactFront(fun, data) {
     mainWindow.webContents.send('execute-ui-action', { fun: fun, data: data });
 }
 
-ipcMain.handle('storage-action', async (event, action, data) => {
+ipcMain.handle('storage-action', async (event, action, data, data2 = "") => {
     switch (action) {
         case 'getAudioFiles':
             return getAudioFiles(data);
+        case 'getMetadata':
+            return getMetadata(data, data2);
         case 'loadMetadata':
-            return loadMetadata(data);
+            return loadMetadata(data, data2);
         case 'saveSettings':
             return saveSettings(data);
         case 'createStorage':
@@ -31,7 +33,7 @@ ipcMain.handle('storage-action', async (event, action, data) => {
         case 'loadPlaylists':
             return loadPlaylists(data);
         default:
-            throw new Error("unknown ipc action");
+            throw new Error("unknown ipc action: " + action);
     }
 });
 
@@ -58,7 +60,23 @@ async function getMetadata(filePath, fileName) {
 
     try {
         const metadata = await mm.parseFile(path.join(filePath, fileName));
-        return metadata;
+
+        let picture;
+        if (metadata.common.picture) {
+            picture = [{
+                format: metadata.common.picture[0].format,
+                base64: metadata.common.picture[0].data.toString('base64')
+            }];
+        }
+
+        let meta = {
+            common: {
+                title: metadata.common.title,
+                artist: metadata.common.artist,
+                picture: picture
+            }
+        }
+        return JSON.stringify(meta);
     } catch (err) {
         console.error(filePath + ", " + fileName);
         console.error("Metadata error:", err);

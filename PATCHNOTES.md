@@ -90,21 +90,23 @@
 - Audio: mp3, flac, m4a, ogg, wav
 - Image: png, jpg
 
--> Volume Selection:
-- Changed from 11 steps to 21 (0%, 5%, 10%,... from 0%, 10%, 20%,...)
-- Can now be held
-
 -> Internal:
 - Reworked node-related code, strictly seperating it from the front-end, which leads to 
 - Improved security
 - Code improvements
 - File tree rework
 
--> Other:
-- Changed default size from 1920x960 to 1280x720
+-> Design:
 - Duration is now displayed in the 0:00 format rather than 0s
 - Replaced text at top with wide logo
 - Added colored bar to the top
-- Fixed being able to change the cover art's animation before it is finished
+
+-> Volume Selection:
+- Changed from 11 steps to 21 (0%, 5%, 10%,... from 0%, 10%, 20%,...)
+- Can now be held
+
+-> Other:
+- Changed default size from 1920x960 to 1280x720
 - App title updates to the current playing song
 - When paused, it returns to "Lunaudia" for privacy reasons
+- Fixed being able to change the cover art's animation before it is finished

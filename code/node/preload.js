@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('lunaudiaAPI', {
 
     // sharing functions
     getAudioFiles: (audioFolders = []) => ipcRenderer.invoke('storage-action', 'getAudioFiles', audioFolders),
+    getMetadata: (filePath, fileName = "") => ipcRenderer.invoke('storage-action', 'getMetadata', filePath, fileName),
     loadMetadata: (filePath, fileName = "") => ipcRenderer.invoke('storage-action', 'loadMetadata', filePath, fileName),
     saveSettings: (data = []) => ipcRenderer.invoke('storage-action', 'saveSettings', data),
     createStorage: (data = []) => ipcRenderer.invoke('storage-action', 'createStorage', data),

@@ -9,6 +9,8 @@ class Playlist {
                 this[o] = other[o];
             }
         }
+
+        this.imageSong = undefined;
     }
 
     createContent(i, y) {
@@ -82,13 +84,12 @@ class Playlist {
         if (cov != undefined && cov != "cover") this.preloadedCover = cov;
     }
 
-    loadSongs() {
+    async loadSongs() {
         if (this.type == "path") {
             // songs are paths here instead
             audioFolders = this.paths;
-            reloadAllSongs();
+            this.amountOfSongs = await reloadAllSongs();
             updatePlayingSong();
-            this.amountOfSongs = playlist.length;
         }
     }
 
@@ -106,9 +107,18 @@ function getPlaylist(name) {
 
 var playlists = [
     new Playlist('path', 'Local', [], {
-        paths: [window.lunaudiaAPI.getFolderPathAudio(),
-        window.lunaudiaAPI.pathome("Music"),]
+        paths: []
     })
 ];
+
+async function prepareLocalPlaylist(folders) {
+    /*
+    playlists[0].paths[0] = await window.lunaudiaAPI.getFolderPathAudio();
+    playlists[0].paths[1] = await window.lunaudiaAPI.pathome("Music");
+    console.log(playlists[0].paths);
+    */
+
+    playlists[0].paths = folders;
+}
 
 var selectedPlaylistForPaths = "";

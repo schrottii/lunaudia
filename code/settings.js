@@ -38,5 +38,7 @@ async function loadData() {
     let loadedFiles = await window.lunaudiaAPI.getAudioFiles(JSON.stringify(audioFolders));
     playlist = loadedFiles;
     //console.log(playlists, playlist);
+
+    prepareLocalPlaylist(audioFolders);
 }
 loadData();

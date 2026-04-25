@@ -105,7 +105,7 @@ async function getNewPath() {
     //audioFolders.push(newPath);
 
     reloadAllSongs();
-    window.lunaudiaAPI.savePaths();
+    window.lunaudiaAPI.savePaths(audioFolders);
     return newPath;
 }
 
