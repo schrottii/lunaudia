@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 
-const isDebug = true;
+const isDebug = false;
 
 const folderPathAudio = isDebug
     ? path.join(__dirname, "../../audio")
