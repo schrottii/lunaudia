@@ -66,7 +66,8 @@ class Playlist {
             i + "_select", i + "_selectImg", i + "_selectTxt",
             i + "_changeName", i + "_changeNameImg", i + "_changeNameTxt",
             i + "_addPath", i + "_addPathImg", i + "_addPathTxt",
-            i + "_paths", i + "_pathsImg", i + "_pathsTxt"
+            i + "_paths", i + "_pathsImg", i + "_pathsTxt",
+            i + "_remove", i + "_removeImg", i + "_removeTxt"
         ];
     }
 
