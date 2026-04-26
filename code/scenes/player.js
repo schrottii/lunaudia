@@ -46,6 +46,8 @@ function nextSong() {
 let audioCtx;
 let source, gainNodeL, gainNodeR, merger, splitter;
 
+var monoButtons = ["btn_mono_stereo", "btn_mono_left", "btn_mono_right", "btn_mono_dual"];
+
 function updatePlayingSong() {
     if (playlist[playlistP] === undefined) return false;
 
@@ -90,6 +92,11 @@ function updateMonoSettings() {
 
     gainNodeL.gain.value = 1;
     gainNodeR.gain.value = 1;
+
+    for (let obj of monoButtons) {
+        objects[obj + "_t"].color = "black";
+    }
+    objects["btn_mono_" + mono + "_t"].color = "white";
 
     switch (mono) {
         case "stereo":
@@ -252,13 +259,13 @@ scenes["player"] = new Scene(
 
         // mono
         createButton("btn_mono_stereo", 0.7, 0.15, 0.05, 0.05, "button", () => { mono = "stereo" });
-        createText("btn_mono_stereo_t", 0.725, 0.185, "stereo", {});
+        createText("btn_mono_stereo_t", 0.725, 0.185, "stereo", { color: "black" });
         createButton("btn_mono_left", 0.75, 0.15, 0.05, 0.05, "button", () => { mono = "left" });
-        createText("btn_mono_left_t", 0.775, 0.185, "left", {});
+        createText("btn_mono_left_t", 0.775, 0.185, "left", { color: "black" });
         createButton("btn_mono_right", 0.8, 0.15, 0.05, 0.05, "button", () => { mono = "right" });
-        createText("btn_mono_right_t", 0.825, 0.185, "right", {});
+        createText("btn_mono_right_t", 0.825, 0.185, "right", { color: "black" });
         createButton("btn_mono_dual", 0.85, 0.15, 0.05, 0.05, "button", () => { mono = "dual" });
-        createText("btn_mono_dual_t", 0.875, 0.185, "dual", {});
+        createText("btn_mono_dual_t", 0.875, 0.185, "dual", { color: "black" });
 
 
         // right side: volume selection

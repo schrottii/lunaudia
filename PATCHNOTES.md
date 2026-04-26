@@ -124,5 +124,6 @@
 - Right: only played in right ear
 - Dual: like stereo but "more full"
 
--> Other:
+-> Bug fixes:
 - Fixed playlist loading issues
+- Fixed movement of the new remove playlist button
