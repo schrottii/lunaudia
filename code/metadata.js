@@ -9,8 +9,8 @@ function base64ToImage(base64) {
 
 function fetchSongData(type, CMD = currentMetadata) {
     let noMD = CMD == undefined || CMD.common == undefined || CMD.common[type.toLowerCase()] == undefined;
-    console.log("no: " + noMD + ", MD: ");
-    console.log(CMD);
+    //console.log("no: " + noMD + ", MD: ");
+    //console.log(CMD);
 
     switch (type) {
         case "title":
@@ -23,7 +23,7 @@ function fetchSongData(type, CMD = currentMetadata) {
         case "picture":
             if (noMD || CMD.common.picture == undefined) return "cover";
             try {
-                console.log(CMD.common);
+                //console.log(CMD.common);
                 let picture = CMD.common.picture[0];
                 let title = CMD.common.title;
 
@@ -73,7 +73,7 @@ async function updateMusicMetadata() {
     let loadedMD = await window.lunaudiaAPI.getMetadata(currentSong, "");
     if (loadedMD == undefined || loadedMD == false) return false;
     loadedMD = JSON.parse(loadedMD);
-    console.log(loadedMD);
+    //console.log(loadedMD);
 
     if (loadedMD) {
         objects["infoText2"].text = "Track: " + fetchSongData("title", loadedMD) + fetchSongData("artist", loadedMD);
@@ -86,11 +86,11 @@ async function updateMusicMetadata() {
         if (loadedCoverArt !== undefined) objects["coverArt"].image = loadedCoverArt;
     }
     else if (loadedMD) {
-        console.log("trying to load the song's cover art");
+        //console.log("trying to load the song's cover art");
         objects["coverArt"].image = fetchSongData("picture", loadedMD);
     }
     else {
-        console.log("default cover");
+        //console.log("default cover");
         objects["coverArt"].image = "cover";
     }
 }
