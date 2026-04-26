@@ -27,14 +27,16 @@ function createStorage(data) {
     }
 }
 
-function savePaths(audioFolders = []) {
+function savePaths(audioFolders = "[]") {
+    audioFolders = JSON.parse(audioFolders);
     fs.writeFile(path.join(folderPathStorage, "paths.json"), JSON.stringify(audioFolders, null, 2), () => { });
 }
 
 function loadPaths() {
+    // deprecated?
     if (!fs.existsSync(path.join(folderPathStorage, "paths.json"))) return false;
     let data = fs.readFileSync(path.join(folderPathStorage, "paths.json"), "utf-8");
-    return JSON.parse(data);
+    return JSON.stringify(data);
 }
 
 function saveSettings(data) {
@@ -53,24 +55,18 @@ function savePlaylists(playlists) {
 }
 
 function loadPlaylists(playlists) {
-    playlists = JSON.parse(playlists);
+    playlists = JSON.parse(playlists); // fallback
 
     if (!fs.existsSync(path.join(folderPathStorage, "playlists.json"))) {
+        // playlists file doesn't exist, write default (local playlist) into it
         savePlaylists(playlists);
         return JSON.stringify(playlists);
     }
-    fs.readFileSync(path.join(folderPathStorage, "playlists.json"), "utf-8", (err, data) => {
-        let rawPlaylists = JSON.parse(data);
-        let rp;
-        playlists = [];
-
-        for (let r in rawPlaylists) {
-            rp = rawPlaylists[r];
-            playlists.push(new Playlist(rp.type, rp.name, [], rp));
-            playlists[playlists.length - 1].getImage();
-        }
+    return fs.readFileSync(path.join(folderPathStorage, "playlists.json"), "utf-8", (err, data) => {
+        // load playlist file
+        data = data.replaceAll("\\", "/");
+        return JSON.stringify(data);
     });
-    return JSON.stringify(playlists);
 }
 
 loadSettings();

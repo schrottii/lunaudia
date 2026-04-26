@@ -123,3 +123,6 @@
 - Left: only played in left ear
 - Right: only played in right ear
 - Dual: like stereo but "more full"
+
+-> Other:
+- Fixed playlist loading issues
