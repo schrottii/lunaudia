@@ -114,7 +114,7 @@
 
 
 
-## 1.4.1 ()
+## 1.4.1 (2026-04-26)
 -> Mono Audio System:
 - Added, this allows you to change how the audio is played
 - Changed via buttons in the top right

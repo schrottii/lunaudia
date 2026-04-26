@@ -2,7 +2,7 @@
 
 var Lunaudia = {
     version: "1.4.1",
-    versiondate: "WIP"
+    versiondate: "2026-04-26"
 }
 
 // WGGJ
