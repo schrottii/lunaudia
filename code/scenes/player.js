@@ -7,6 +7,8 @@ var timer = 0;
 var repeat = false;
 var shuffle = false;
 
+var mono = "stereo";
+
 wggjAudio.onended = () => {
     if (playlistP < playlist.length - 1) {
         nextSong();
@@ -41,6 +43,9 @@ function nextSong() {
     }
 }
 
+let audioCtx;
+let source, gainNodeL, gainNodeR, merger, splitter;
+
 function updatePlayingSong() {
     if (playlist[playlistP] === undefined) return false;
 
@@ -50,7 +55,68 @@ function updatePlayingSong() {
     wggjAudio.src = currentSong;
     wggjAudio.loop = repeat;
 
+    // mono audio support!
+    if (mono != "stereo") {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            source = audioCtx.createMediaElementSource(wggjAudio);
+
+            gainNodeL = audioCtx.createGain();
+            gainNodeR = audioCtx.createGain();
+
+            splitter = audioCtx.createChannelSplitter(2);
+            merger = audioCtx.createChannelMerger(2);
+
+            source.connect(splitter);
+
+            splitter.connect(gainNodeL, 0);
+            splitter.connect(gainNodeR, 1);
+            gainNodeL.connect(merger, 0, 0);
+            gainNodeR.connect(merger, 0, 1);
+
+            merger.connect(audioCtx.destination);
+        }
+    }
+    updateMonoSettings();
+
     asyncLoader(["songUI"]);
+}
+
+function updateMonoSettings() {
+    if (!audioCtx) return;
+
+    gainNodeL.disconnect();
+    gainNodeR.disconnect();
+
+    gainNodeL.gain.value = 1;
+    gainNodeR.gain.value = 1;
+
+    switch (mono) {
+        case "stereo":
+            gainNodeL.connect(merger, 0, 0);
+            gainNodeR.connect(merger, 0, 1);
+            break;
+
+        case "left":
+            gainNodeL.connect(merger, 0, 0);
+            gainNodeR.gain.value = 0;
+            break;
+
+        case "right":
+            gainNodeR.connect(merger, 0, 1);
+            gainNodeL.gain.value = 0;
+            break;
+
+        case "dual":
+            gainNodeL.connect(merger, 0, 0);
+            gainNodeL.connect(merger, 0, 1);
+            gainNodeR.connect(merger, 0, 0);
+            gainNodeR.connect(merger, 0, 1);
+            break;
+    }
+
+    //gainNodeL.gain.value = (mono === "right") ? 0 : 1;
+    //gainNodeR.gain.value = (mono === "left") ? 0 : 1;
 }
 
 async function updatePlayingSongUI() {
@@ -182,6 +248,17 @@ scenes["player"] = new Scene(
         createImage("btnAddSourceImg", 0.1, 0.35, 0.08, 0.08, "folders", { quadratic: true, centered: true });
         createText("promptText", 0.108, 0.4, "", { size: 24, align: "left" });
 
+
+
+        // mono
+        createButton("btn_mono_stereo", 0.7, 0.15, 0.05, 0.05, "button", () => { mono = "stereo" });
+        createText("btn_mono_stereo_t", 0.725, 0.185, "stereo", {});
+        createButton("btn_mono_left", 0.75, 0.15, 0.05, 0.05, "button", () => { mono = "left" });
+        createText("btn_mono_left_t", 0.775, 0.185, "left", {});
+        createButton("btn_mono_right", 0.8, 0.15, 0.05, 0.05, "button", () => { mono = "right" });
+        createText("btn_mono_right_t", 0.825, 0.185, "right", {});
+        createButton("btn_mono_dual", 0.85, 0.15, 0.05, 0.05, "button", () => { mono = "dual" });
+        createText("btn_mono_dual_t", 0.875, 0.185, "dual", {});
 
 
         // right side: volume selection

@@ -111,3 +111,15 @@
 - App title updates to the current playing song
 - When paused, it returns to "Lunaudia" for privacy reasons
 - Fixed being able to change the cover art's animation before it is finished
+
+
+
+## 1.4.1 ()
+-> Mono Audio System:
+- Added, this allows you to change how the audio is played
+- Changed via buttons in the top right
+- Only applied when changing song
+- Stereo: same as before
+- Left: only played in left ear
+- Right: only played in right ear
+- Dual: like stereo but "more full"

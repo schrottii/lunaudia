@@ -1,5 +1,10 @@
 // this file is the equivalent to the usual main.js, as that name is taken by node here
 
+var Lunaudia = {
+    version: "1.4.1",
+    versiondate: "WIP"
+}
+
 // WGGJ
 images = {
     // core
