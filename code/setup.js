@@ -1,5 +1,10 @@
 // this file is the equivalent to the usual main.js, as that name is taken by node here
 
+var Lunaudia = {
+    version: "1.4.1",
+    versiondate: "2026-04-26"
+}
+
 // WGGJ
 images = {
     // core
@@ -105,7 +110,7 @@ async function getNewPath() {
     //audioFolders.push(newPath);
 
     reloadAllSongs();
-    window.lunaudiaAPI.savePaths(audioFolders);
+    window.lunaudiaAPI.savePaths(JSON.stringify(audioFolders));
     return newPath;
 }
 
