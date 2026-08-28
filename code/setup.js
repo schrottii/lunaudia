@@ -1,9 +1,11 @@
 // this file is the equivalent to the usual main.js, as that name is taken by node here
 
 var Lunaudia = {
-    version: "1.4.1",
-    versiondate: "2026-04-26"
+    version: "1.5",
+    versiondate: "2026-08-28"
 }
+
+var asyncLoaders = [];
 
 // WGGJ
 images = {
@@ -42,6 +44,7 @@ images = {
 wggj.config.startScene = "player";
 wggj.config.gameName = "Lunaudia";
 wggj.config.font = "OpenSans";
+wggj.config.imageBasePath = "";
 
 wggjLoadImages();
 wggjLoop();
@@ -55,7 +58,8 @@ var customPrompt = {
     prevKey: "",
     text: "",
     message: "",
-    resolve: null
+    resolve: null,
+    scene: ""
 }
 
 function createCustomPrompt(message) {
@@ -64,6 +68,7 @@ function createCustomPrompt(message) {
         customPrompt.text = "";
         customPrompt.message = message;
         customPrompt.resolve = resolve;
+        customPrompt.scene = wggj.canvas.currentScene;
     });
 }
 
@@ -96,7 +101,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         // remove string stuff
         for (let char in customPrompt.text) {
-            if (customPrompt.text[char] == '"' || customPrompt.text[char] == "'" || customPrompt.text[char] == "`") customPrompt.text.splice(char, 1);
+            if (customPrompt.text[char] == '"' || customPrompt.text[char] == "'" || customPrompt.text[char] == "`") customPrompt.text = customPrompt.text.substr(0, char) + customPrompt.text.substr(char + 1);
         }
 
         // finalize
@@ -113,6 +118,22 @@ async function getNewPath() {
     window.lunaudiaAPI.savePaths(JSON.stringify(audioFolders));
     return newPath;
 }
+
+function customWGGJLoop(tick) {
+    if (customPrompt == undefined) return;
+    if (customPrompt.scene != wggj.canvas.currentScene) {
+        customPrompt.active = false;
+    }
+    if (objects["promptText"] != undefined) {
+        if (customPrompt.active) {
+            timer = (timer + (tick / 1000)) % 1;
+            objects["promptText"].text = customPrompt.active ? (customPrompt.text + (timer > 0.5 ? "|" : "")) : "";
+        }
+        else objects["promptText"].text = "";
+    }
+}
+
+
 
 function convertSeconds(s) {
     if (s == undefined || isNaN(s)) return "0:00";
@@ -159,7 +180,7 @@ function createListWindowElement(element, e, height) {
     let y = 0.1 + height * e;
     let coverImage = element.getImage();
 
-    createSquare("list_" + e + "_bg", 0, y, 1, height - 0.01, "rgb(200, 0, 100)");
+    createSquare("list_" + e + "_bg", 0, y, 1, height - 0.01, "rgb(120, 0, 90, 0.5)");
     if (coverImage) createImage("list_" + e + "_img", 0.05, y + 0.02, 0.16, 0.16, coverImage, { quadratic: true });
 
     objects["listContainer"].children.push("list_" + e + "_bg");
@@ -195,6 +216,13 @@ window.lunaudiaAPI.onExecuteAction((data) => {
             //console.log("placeholder");
             images.cover = images.placeholderCover;
             break;
+        case "loadFile":
+            console.log(data.data);
+            setTimeout(() => {
+                playlist = [data.data];
+                updatePlayingSong();
+            }, 500);
+            break;
     }
 });
 
@@ -209,8 +237,6 @@ function setCover(src0) {
 }
 
 
-
-var asyncLoaders = [];
 
 function asyncLoader(content) {
     content.unshift(false);

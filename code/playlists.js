@@ -3,14 +3,16 @@ class Playlist {
         this.type = type;
         this.name = name ? name : "";
         this.songs = songs ? songs : [];
+
+        this.imageSong = undefined;
+        this.imagePath = undefined;
+
         if (other) {
             for (let o in other) {
                 if (o == "type" || o == "name" || o == "songs" || o == "other" || o == "preloadedCover") continue;
                 this[o] = other[o];
             }
         }
-
-        this.imageSong = undefined;
     }
 
     createContent(i, y) {
@@ -21,9 +23,11 @@ class Playlist {
         createButton(i + "_select", 0.4, y + 0.08, 0.1, 0.1, "button", () => {
             settings.currentPlaylist = this.name;
             this.loadSongs();
-        }, { quadratic: true, centered: true });
-        createImage(i + "_selectImg", 0.4, y + 0.08, 0.1, 0.1, "play", { quadratic: true, centered: true });
-        createText(i + "_selectTxt", 0.4, y + 0.08, "Select", { size: 24, color: "white" });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "play" },
+            aText: { size: 24, color: "#FF9BF1", text: "Select", offset: [0, -0.075 * wggj.canvas.h] }
+        });
 
         createButton(i + "_changeName", 0.5, y + 0.08, 0.1, 0.1, "button", async () => {
             let oldName = this.name;
@@ -31,23 +35,29 @@ class Playlist {
 
             this.name = newName;
             if (settings.currentPlaylist == oldName) settings.currentPlaylist = newName;
-        }, { quadratic: true, centered: true });
-        createImage(i + "_changeNameImg", 0.5, y + 0.08, 0.1, 0.1, "edit", { quadratic: true, centered: true });
-        createText(i + "_changeNameTxt", 0.5, y + 0.08, "Change name", { size: 24, color: "white" });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "edit" },
+            aText: { size: 24, color: "#FF9BF1", text: "Change name", offset: [0, -0.075 * wggj.canvas.h] }
+        });
 
         createButton(i + "_addPath", 0.6, y + 0.08, 0.1, 0.1, "button", async () => {
             let newSong = await getNewPath();
             if (!this.paths.includes(newSong)) this.paths.push(newSong);
-        }, { quadratic: true, centered: true });
-        createImage(i + "_addPathImg", 0.6, y + 0.08, 0.1, 0.1, "newfolder", { quadratic: true, centered: true });
-        createText(i + "_addPathTxt", 0.6, y + 0.08, "Add path", { size: 24, color: "white" });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "newfolder" },
+            aText: { size: 24, color: "#FF9BF1", text: "Add path", offset: [0, -0.075 * wggj.canvas.h] }
+        });
 
         createButton(i + "_paths", 0.7, y + 0.08, 0.1, 0.1, "button", async () => {
             selectedPlaylistForPaths = this;
             loadScene("managePaths");
-        }, { quadratic: true, centered: true });
-        createImage(i + "_pathsImg", 0.7, y + 0.08, 0.1, 0.1, "editfolder", { quadratic: true, centered: true });
-        createText(i + "_pathsTxt", 0.7, y + 0.08, "", { size: 24, color: "white" });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "editfolder" },
+            aText: { size: 24, color: "#FF9BF1", text: "", offset: [0, -0.075 * wggj.canvas.h] }
+        });
 
         createButton(i + "_remove", 0.8, y + 0.08, 0.1, 0.1, "button", async () => {
             let index = -1;
@@ -57,17 +67,28 @@ class Playlist {
             if (index === -1) return false;
             playlists.splice(index, 1);
             loadScene("playlists");
-        }, { quadratic: true, centered: true });
-        createImage(i + "_removeImg", 0.8, y + 0.08, 0.1, 0.1, "delete", { quadratic: true, centered: true });
-        createText(i + "_removeTxt", 0.8, y + 0.08, "Remove", { size: 24, color: "white" });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "delete" },
+            aText: { size: 24, color: "#FF9BF1", text: "Remove", offset: [0, -0.075 * wggj.canvas.h] }
+        });
+
+        createButton(i + "_imagePath", 0.9, y + 0.08, 0.1, 0.1, "button", async () => {
+            this.imagePath = await createCustomPrompt("New image path: ");
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "edit" },
+            aText: { size: 20, color: "#FF9BF1", text: "Image from path", offset: [0, -0.075 * wggj.canvas.h] }
+        });
 
         return [
             i + "_name", i + "_sel",
-            i + "_select", i + "_selectImg", i + "_selectTxt",
-            i + "_changeName", i + "_changeNameImg", i + "_changeNameTxt",
-            i + "_addPath", i + "_addPathImg", i + "_addPathTxt",
-            i + "_paths", i + "_pathsImg", i + "_pathsTxt",
-            i + "_remove", i + "_removeImg", i + "_removeTxt"
+            i + "_select",
+            i + "_changeName",
+            i + "_addPath",
+            i + "_paths",
+            i + "_remove",
+            i + "_imagePath",
         ];
     }
 
@@ -76,13 +97,24 @@ class Playlist {
         if (objects[i + "_name"] == undefined) return false;
         objects[i + "_name"].text = this.name + " (" + this.getAmountOfSongs() + " songs)";
         objects[i + "_sel"].text = settings.currentPlaylist == this.name ? "Selected" : "";
-        objects[i + "_select"].power = objects[i + "_selectTxt"].power = objects[i + "_selectImg"].power = !(settings.currentPlaylist == this.name);
-        objects[i + "_pathsTxt"].text = this.paths.length + " paths";
+        objects[i + "_select"].power = objects[i + "_select:text"].power = objects[i + "_select:image"].power = !(settings.currentPlaylist == this.name);
+        objects[i + "_paths:text"].text = this.paths.length + " paths";
 
         objects["list_" + i + "_img"].image = this.getImage();
     }
 
     getImage() {
+        if (this.imagePath) {
+            if (images[this.imagePath] == undefined) {
+                try {
+                    images[this.imagePath] = base64ToImage(this.imagePath);
+                }
+                catch {
+                    this.imagePath = "placeholderCover";
+                }
+            }
+            return this.imagePath;
+        }
         if (this.preloadedCover) {
             return this.preloadedCover;
         }

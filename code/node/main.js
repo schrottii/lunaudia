@@ -166,6 +166,15 @@ function getAudioFiles(audioFolders = "") {
     return JSON.stringify(files);
 }
 
+function getFilePathFromArgv(argv) {
+    let path = undefined;
+    for (let suffix of allowedAudioExtensions) {
+        path = argv.find(arg => arg.toLowerCase().endsWith(suffix));
+        if (path != undefined) break;
+    }
+    return path;
+}
+
 
 
 function createWindow() {
@@ -185,17 +194,34 @@ function createWindow() {
 
     // open only http and https links in external browser
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        // open external links, well, externally
         if (url.startsWith('http:') || url.startsWith('https:')) {
             shell.openExternal(url);
             return { action: 'deny' };
         }
-        return { action: 'allow' }; // allow local/internal stuff
+        // allow local/internal stuff to be opened in another window
+        return {
+            action: 'allow',
+            overrideBrowserWindowOptions: {
+                autoHideMenuBar: true,
+                webPreferences: {
+                    devTools: false
+                }
+            }
+        };
     });
 
     mainWindow.webContents.on('will-navigate', (event, url) => {
         if (url.startsWith('http:') || url.startsWith('https:')) {
             event.preventDefault();
             shell.openExternal(url);
+        }
+    });
+
+    mainWindow.once('ready-to-show', () => {
+        let filePath = getFilePathFromArgv(process.argv);
+        if (filePath) {
+            contactFront("loadFile", filePath);
         }
     });
 

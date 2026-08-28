@@ -1,9 +1,9 @@
-## 1.0 (2025-08-16)
+## v1.0 (2025-08-16)
 - Release
 
 
 
-## 1.1 (2025-08-19)
+## v1.1 (2025-08-19)
 -> Lunaudia:
 - Lunaudio is now called Lunaudia
 
@@ -23,7 +23,7 @@
 
 
 
-## 1.2 (2025-11-19)
+## v1.2 (2025-11-19)
 -> Automatic Metadata:
 - Lunaudia can now extract metadata from most audio files! (if they have it)
 - This is automatic, no need to do anything 
@@ -58,7 +58,7 @@
 
 
 
-## 1.3 (2025-12-19)
+## v1.3 (2025-12-19)
 -> Playlists:
 - Added the foundations of a library: Playlists!
 - Previously, you only had "one playlist" (with multiple paths, audio folder and Music folder by default), that is now the default playlist ("Local")
@@ -114,7 +114,7 @@
 
 
 
-## 1.4.1 (2026-04-26)
+## v1.4.1 (2026-04-26)
 -> Mono Audio System:
 - Added, this allows you to change how the audio is played
 - Changed via buttons in the top right
@@ -130,3 +130,58 @@
 -> Bug fixes:
 - Fixed playlist loading issues
 - Fixed movement of the new remove playlist button
+
+
+
+## v1.5 (2026-08-28)
+-> Playlist picker:
+- Added to the player scene, left side
+- One button for each song, like a tracklist, click to quickly jump to it
+- Up to 250 buttons/songs listed
+- The selected/current song is highlighted (no transparency)
+- Scrollable (there is some extra space on the right side to scroll without selecting)
+
+-> Playlists:
+- Added button (and support) for setting the cover from a path, saved after closing
+- Improved loading Local playlist on startup
+- Fixed duplication of Local playlist
+
+-> Mono Audio System:
+- Is now treated as a proper setting, saved after closing
+- Clicking one will change the color to purple, indicate it will change to that on the next song
+
+-> Prompt inputs:
+- Improved handling of apostrophes
+- Now cancelled when changing scene
+
+-> Design:
+- Playlists, paths: changed color and added transparency for rows
+- Playlist, paths: changed color of button texts
+- Moved back buttons to the top right and made them wider
+- Changed button image
+
+-> Design (Player Scene):
+- Volume Selection: added pink gradient (higher = more pink)
+- Added background for the info (left side)
+- Moved info further left
+- Moved shuffle and repeat to the right (next to the volume selection)
+- Moved playlist, help and Mono Audio System buttons to the top
+
+-> Design (Info Scene):
+- Added button to open patch notes
+- Added buttons to open the new license, ToS & privacy policy files (bottom left)
+- Moved text and buttons higher
+- Moved back button
+
+-> Documentation:
+- Massively expanded the README.md:
+- Download / Install step-by-step guide
+- Info on how to use it, including ways to play audio, playlist buttons, and more
+- Supported file formats list
+- Building info (mostly for myself)
+
+-> Other:
+- You can now use "Open with" or drag a song onto the .exe to open it with Lunaudia (only one at a time, probably Windows-only)
+- Added LICENSE.md (Balnoom license with some Lunaudia-specific bits), TOS.md & PRIVACY.md 
+- They can be accessed from the Info scene (bottom left), the PATCHNOTES.md as well
+- Updated WGGJ from v1.5.1 to v1.7 and converted many objects to attachments

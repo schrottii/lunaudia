@@ -15,31 +15,37 @@ class PLPath {
             this.path = newName;
             this.origin.paths[this.origin.paths.indexOf(this.path)] = newName;
             if (this.origin.name == settings.currentPlaylist) this.origin.loadSongs();
-        }, { quadratic: true, centered: true });
-        createImage(i + "_changeImg", 0.4, y + 0.08, 0.1, 0.1, "editfolder", { quadratic: true, centered: true });
-        createText(i + "_changeTxt", 0.4, y + 0.08, "Change", { size: 24, color: "white" });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "editfolder" },
+            aText: { size: 24, color: "#FF9BF1", text: "Change", offset: [0, -0.075 * wggj.canvas.h] }
+        });
 
         createButton(i + "_remove", 0.5, y + 0.08, 0.1, 0.1, "button", async () => {
             //console.log(this.path, this.origin.paths);
             this.origin.paths.splice(this.origin.paths.indexOf(this.path), 1);
             loadScene("managePaths");
-        }, { quadratic: true, centered: true });
-        createImage(i + "_removeImg", 0.5, y + 0.08, 0.1, 0.1, "delete", { quadratic: true, centered: true });
-        createText(i + "_removeTxt", 0.5, y + 0.08, "Remove", { size: 24, color: "white" });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "delete" },
+            aText: { size: 24, color: "#FF9BF1", text: "Remove", offset: [0, -0.075 * wggj.canvas.h] }
+        });
 
         createButton(i + "_subdirs", 0.6, y + 0.08, 0.1, 0.1, "button", async () => {
             this.checkPathSettings();
             if (this.origin.pathSettings[this.path].subdirs == true) this.origin.pathSettings[this.path].subdirs = false;
             else this.origin.pathSettings[this.path].subdirs = true; // default if undefined
-        }, { quadratic: true, centered: true });
-        createImage(i + "_subdirsImg", 0.6, y + 0.08, 0.1, 0.1, "folders", { quadratic: true, centered: true });
-        createText(i + "_subdirsTxt", 0.6, y + 0.08, "Subdirs?", { size: 24, color: "white" });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "folders" },
+            aText: { size: 24, color: "#FF9BF1", text: "Subdirs?", offset: [0, -0.075 * wggj.canvas.h] }
+        });
 
         return [
             i + "_name", i + "_sel",
-            i + "_change", i + "_changeImg", i + "_changeTxt",
-            i + "_remove", i + "_removeImg", i + "_removeTxt",
-            i + "_subdirs", i + "_subdirsImg", i + "_subdirsTxt"
+            i + "_change",
+            i + "_remove",
+            i + "_subdirs",
         ];
     }
 
@@ -96,13 +102,13 @@ scenes["managePaths"] = new Scene(
         createText("btnNewText", 0.75, 0.075, "+", { size: 40, color: "white" });
 
         // Back button
-        createButton("btnBack", 0.9, 0, 0.1, 0.1, "button", () => {
+        createButton("btnBack", 0.8, 0, 0.2, 0.1, "button", () => {
             loadScene("playlists");
-        }, { quadratic: true, centered: true });
-        createText("btnBackText", 0.9, 0.075, "Back", { size: 40, color: "white" });
+        }, {
+            aText: { size: 32, color: "white", text: "< Back" }
+        });
     },
     (tick) => {
         updateListWindow(plpaths);
-        objects["promptText"].text = customPrompt.active ? ("New path: " + customPrompt.text + (timer > 0.5 ? "|" : "")) : "";
     }
 );

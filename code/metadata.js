@@ -81,7 +81,11 @@ async function updateMusicMetadata() {
         if (currentMetadata != undefined && currentMetadata.common.title != undefined) objects["metadataStatus"].power = true;
     }
 
-    if (getPlaylist(settings.currentPlaylist) != undefined && getPlaylist(settings.currentPlaylist).imageSong != undefined) {
+    if (getPlaylist(settings.currentPlaylist) != undefined && getPlaylist(settings.currentPlaylist).imagePath != undefined) {
+        let loadedCoverArt = getPlaylist(settings.currentPlaylist).getImage();
+        if (loadedCoverArt !== undefined) objects["coverArt"].image = loadedCoverArt;
+    }
+    else if (getPlaylist(settings.currentPlaylist) != undefined && getPlaylist(settings.currentPlaylist).imageSong != undefined) {
         let loadedCoverArt = await getPlaylistCover();
         if (loadedCoverArt !== undefined) objects["coverArt"].image = loadedCoverArt;
     }
@@ -93,4 +97,6 @@ async function updateMusicMetadata() {
         //console.log("default cover");
         objects["coverArt"].image = "cover";
     }
+
+    return loadedMD;
 }

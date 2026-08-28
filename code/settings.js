@@ -1,6 +1,7 @@
 var settings = {
     volume: 0.5,
     currentPlaylist: "",
+    mono: "stereo"
 }
 
 var audioFolders = [];
@@ -38,6 +39,7 @@ async function loadData() {
     let rp;
     for (let r in loadedPlaylists) {
         rp = loadedPlaylists[r];
+        if (rp.name == "Local") continue;
         //console.log(r, rp);
         playlists.push(new Playlist(rp.type, rp.name, [], rp));
         playlists[playlists.length - 1].getImage();
@@ -45,7 +47,7 @@ async function loadData() {
     //console.log(playlists, playlist);
 
     let loadedFiles = await window.lunaudiaAPI.getAudioFiles(JSON.stringify(audioFolders));
-    playlist = loadedFiles;
+    playlist = JSON.parse(loadedFiles);// [loadedFiles.substr(1).substr(0, loadedFiles.length - 1)];
     //console.log(playlists, playlist);
 
     prepareLocalPlaylist(audioFolders);

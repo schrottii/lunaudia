@@ -7,7 +7,7 @@ var timer = 0;
 var repeat = false;
 var shuffle = false;
 
-var mono = "stereo";
+//var mono = "stereo";
 
 wggjAudio.onended = () => {
     if (playlistP < playlist.length - 1) {
@@ -51,14 +51,15 @@ var monoButtons = ["btn_mono_stereo", "btn_mono_left", "btn_mono_right", "btn_mo
 function updatePlayingSong() {
     if (playlist[playlistP] === undefined) return false;
 
-    wggjAudio.currentTime = 0;
     currentSong = playlist[playlistP];
+
+    wggjAudio.currentTime = 0;
 
     wggjAudio.src = currentSong;
     wggjAudio.loop = repeat;
 
     // mono audio support!
-    if (mono != "stereo") {
+    if (settings.mono != "stereo") {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             source = audioCtx.createMediaElementSource(wggjAudio);
@@ -96,9 +97,9 @@ function updateMonoSettings() {
     for (let obj of monoButtons) {
         objects[obj + "_t"].color = "black";
     }
-    objects["btn_mono_" + mono + "_t"].color = "white";
+    objects["btn_mono_" + settings.mono + "_t"].color = "white";
 
-    switch (mono) {
+    switch (settings.mono) {
         case "stereo":
             gainNodeL.connect(merger, 0, 0);
             gainNodeR.connect(merger, 0, 1);
@@ -122,28 +123,64 @@ function updateMonoSettings() {
             break;
     }
 
-    //gainNodeL.gain.value = (mono === "right") ? 0 : 1;
-    //gainNodeR.gain.value = (mono === "left") ? 0 : 1;
+    //gainNodeL.gain.value = (settings.mono === "right") ? 0 : 1;
+    //gainNodeR.gain.value = (settings.mono === "left") ? 0 : 1;
 }
 
 async function updatePlayingSongUI() {
+    currentMetadata = await updateMusicMetadata();
+
     objects["metadataStatus"].power = false;
 
+    console.log(currentMetadata);
     let title = await fetchSongData("title");
     let artist = await fetchSongData("artist");
-    //console.log(title, artist);
+    let cover = await fetchSongData("picture");
+
     let discordReturn = await window.lunaudiaAPI.updateDiscord(title, artist);
-    console.log(discordReturn);
 
     if (title.length > 2) {
         document.title = title;
     }
     else document.title = "Lunaudia";
 
-    if (objects["coverArt"].image != "cover") objects["coverArtSet"].power = true;
+    console.log(cover);
+    if (cover != "cover") objects["coverArtSet"].power = true;
     else objects["coverArtSet"].power = false;
 
-    await updateMusicMetadata();
+    if (playlist.length > playlistPickerItems) createPlaylistPicker(Math.min(playlist.length - playlistPickerItems, 250));
+    updatePlaylistPicker();
+}
+
+var playlistPickerItems = 0;
+
+function createPlaylistPicker(amount) {
+    for (let i = 0; i < playlistPickerItems + amount; i++) {
+        if (objects["playlistPicker" + i] != undefined) continue; // hmm
+        // create new song button
+        createButton("playlistPicker" + i, 0.01, 0.4 + i * 0.05, 0.175, 0.05, "button", (c) => {
+            if (playlistP == objects[c].songi) return; // would be unnecessary
+            playlistP = objects[c].songi;
+            updatePlayingSong();
+        }, {
+            alpha: 0.4, power: false,
+            aText: { text: "", size: 16, align: "center", color: "white", maxW: 0.16 }
+        });
+        objects["playlistPicker" + i].songi = i;
+
+        // add to scroll container
+        objects["playlistPicker"].addChild("playlistPicker" + i);
+    }
+    playlistPickerItems += amount;
+}
+
+function updatePlaylistPicker() {
+    for (let i = 0; i < playlistPickerItems; i++) {
+        if (objects["playlistPicker" + i] == undefined) break;
+        objects["playlistPicker" + i + ":text"].text = playlist[i] ? playlist[i].split("\\")[playlist[i].split("\\").length - 1] : i;
+        objects["playlistPicker" + i].power = i < playlist.length;
+        objects["playlistPicker" + i].alpha = (playlistP == i) ? 1 : 0.4;
+    }
 }
 
 async function reloadAllSongs() {
@@ -175,7 +212,7 @@ function volumeSelection(c) {
 
 function volumeSelectionUpdate() {
     for (let j = 0; j < 21; j++) {
-        objects["volumeB" + j].color = j <= (settings.volume * 20) ? "#FFFFFF" : "#000000";
+        objects["volumeB" + j].color = j <= (settings.volume * 20) ? ("rgb(" + (255 - j) + "," + (255 - j * 8) + "," + (255 - j * 4) + ")") : "#000000";
         objects["volumeText"].text = (settings.volume * 100).toFixed(0) + "%";
     }
 }
@@ -187,23 +224,36 @@ scenes["player"] = new Scene(
 
         //createImage("icon", 0.01, 0.02, 0.08, 0.08, "icon", { quadratic: true });
         //createText("header", 0.5, 0.1, "Lunaudia", { size: 48, color: "white" });
-        createSquare("topbar", 0, 0, 1, 0.08, "rgb(120, 0, 90)", { alpha: 0.5 });
+        createSquare("topbar", 0, 0, 1, 0.1, "rgb(120, 0, 90)", { alpha: 0.5 });
         createImage("logo", 0.5, 0, 0.3, 0.1, "lunaudia-wide-logo", { centered: true });
 
-        createText("infoText1", 0.1, 0.15, "", { size: 24, color: "white", align: "left" });
-        createText("infoText2", 0.1, 0.2, "", { size: 24, color: "white", align: "left" });
-        createText("infoText3", 0.1, 0.25, "", { size: 24, color: "white", align: "left" });
-        createText("infoText4", 0.1, 0.3, "", { size: 24, color: "white", align: "left" });
+        createSquare("infoTextBG", 0.01, 0.11, 0.2, 0.2, "purple", { alpha: 0.3 });
+        createText("infoText1", 0.02, 0.15, "", { size: 24, color: "white", align: "left" });
+        createText("infoText2", 0.02, 0.2, "", { size: 24, color: "white", align: "left" });
+        createText("infoText3", 0.02, 0.25, "", { size: 24, color: "white", align: "left" });
+        createText("infoText4", 0.02, 0.3, "", { size: 24, color: "white", align: "left" });
+
+        createSquare("playlistListBG", 0.01, 0.34, 0.2, 0.61, "purple", { alpha: 0.3 });
+        createSquare("playlistListBG_2", 0.19, 0.425, 0.015, 0.45, "#FF9BF1", { alpha: 0.3 });
+        createText("infoText5", 0.02, 0.4, "", { size: 24, color: "white", align: "left" });
+
+        createContainer("playlistPicker", 0.01, 0.4, 0.2, 0.5,
+            { YScroll: true, YLimit: [0.00001, 0], YScrollMod: 3, limitEffect: false },
+            []);
+        createPlaylistPicker(10);
+        updatePlaylistPicker();
 
         createImage("metadataStatus", 0.1, 0.35, 0.05, 0.05, "metadata", { power: false, quadratic: true });
 
         createImage("progressBarBG", 0.2, 0.925, 0.6, 0.05, "bar");
         createSquare("progressBarHider", 0.2, 0.925, 0.6, 0.05, "pink");
 
-        createButton("btnInfo", 0.925, 0, 0.1, 0.1, "button", () => {
+        createButton("btnInfo", 0.95, 0, 0.1, 0.1, "button", () => {
             loadScene("info");
-        }, { quadratic: true });
-        createImage("btnInfoImg", 0.925, 0, 0.1, 0.1, "help", { quadratic: true });
+        }, {
+            quadratic: true,
+            aImage: { image: "help" }
+        });
 
         // Bottom Buttons
         createButton("btnPrev", 0.3, 0.8, 0.1, 0.1, "button", () => {
@@ -211,8 +261,10 @@ scenes["player"] = new Scene(
                 playlistP--;
                 updatePlayingSong();
             }
-        }, { quadratic: true, centered: true });
-        createImage("btnPrevImg", 0.3, 0.8, 0.1, 0.1, "previous", { quadratic: true, centered: true });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "previous" }
+        });
 
         createButton("btnPause", 0.5, 0.8, 0.1, 0.1, "button", () => {
             wggjAudio.volume = settings.volume;
@@ -226,47 +278,57 @@ scenes["player"] = new Scene(
                 document.title = "Lunaudia";
             }
             started = true;
-        }, { quadratic: true, centered: true });
-        createImage("btnPauseImg", 0.5, 0.8, 0.1, 0.1, "pause", { quadratic: true, centered: true });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "pause" }
+        });
 
         createButton("btnNext", 0.7, 0.8, 0.1, 0.1, "button", () => {
             if (playlistP < playlist.length - 1 || shuffle) {
                 nextSong();
                 updatePlayingSong();
             }
-        }, { quadratic: true, centered: true });
-        createImage("btnNextImg", 0.7, 0.8, 0.1, 0.1, "next", { quadratic: true, centered: true });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "next" }
+        });
 
-        createButton("btnRepeat", 0.1, 0.75, 0.08, 0.08, "button", () => {
+        createButton("btnRepeat", 0.85, 0.75, 0.08, 0.08, "button", () => {
             repeat = !repeat;
             wggjAudio.loop = repeat;
-        }, { quadratic: true, centered: true });
-        createImage("btnRepeatImg", 0.1, 0.75, 0.08, 0.08, "repeat", { quadratic: true, centered: true });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "repeat" }
+        });
 
-        createButton("btnShuffle", 0.1, 0.55, 0.08, 0.08, "button", () => {
+        createButton("btnShuffle", 0.85, 0.55, 0.08, 0.08, "button", () => {
             shuffle = !shuffle;
-        }, { quadratic: true, centered: true });
-        createImage("btnShuffleImg", 0.1, 0.55, 0.08, 0.08, "shuffle", { quadratic: true, centered: true });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "shuffle" }
+        });
 
-        createButton("btnAddSource", 0.1, 0.35, 0.08, 0.08, "button", () => {
+        createButton("btnAddSource", 0.025, 0, 0.1, 0.1, "button", () => {
             //getNewPath();
             loadScene("playlists");
-        }, { quadratic: true, centered: true });
-        createImage("btnAddSourceImg", 0.1, 0.35, 0.08, 0.08, "folders", { quadratic: true, centered: true });
+        }, {
+            quadratic: true, centered: true,
+            aImage: { image: "folders" }
+        });
         createText("promptText", 0.108, 0.4, "", { size: 24, align: "left" });
 
 
 
         // mono
-        createButton("btn_mono_stereo", 0.7, 0.15, 0.05, 0.05, "button", () => { mono = "stereo" });
-        createText("btn_mono_stereo_t", 0.725, 0.185, "stereo", { color: "black" });
-        createButton("btn_mono_left", 0.75, 0.15, 0.05, 0.05, "button", () => { mono = "left" });
-        createText("btn_mono_left_t", 0.775, 0.185, "left", { color: "black" });
-        createButton("btn_mono_right", 0.8, 0.15, 0.05, 0.05, "button", () => { mono = "right" });
-        createText("btn_mono_right_t", 0.825, 0.185, "right", { color: "black" });
-        createButton("btn_mono_dual", 0.85, 0.15, 0.05, 0.05, "button", () => { mono = "dual" });
-        createText("btn_mono_dual_t", 0.875, 0.185, "dual", { color: "black" });
-
+        createButton("btn_mono_stereo", 0.7, 0.025, 0.05, 0.05, "button", () => { settings.mono = "stereo"; objects["btn_mono_stereo_t"].color = "purple"; });
+        createText("btn_mono_stereo_t", 0.725, 0.06, "stereo", { color: "black" });
+        createButton("btn_mono_left", 0.75, 0.025, 0.05, 0.05, "button", () => { settings.mono = "left"; objects["btn_mono_left_t"].color = "purple"; });
+        createText("btn_mono_left_t", 0.775, 0.06, "left", { color: "black" });
+        createButton("btn_mono_right", 0.8, 0.025, 0.05, 0.05, "button", () => { settings.mono = "right"; objects["btn_mono_right_t"].color = "purple"; });
+        createText("btn_mono_right_t", 0.825, 0.06, "right", { color: "black" });
+        createButton("btn_mono_dual", 0.85, 0.025, 0.05, 0.05, "button", () => { settings.mono = "dual"; objects["btn_mono_dual_t"].color = "purple"; });
+        createText("btn_mono_dual_t", 0.875, 0.06, "dual", { color: "black" });
+        objects["btn_mono_" + settings.mono + "_t"].color = "white";
 
         // right side: volume selection
         for (let i = 0; i < 21; i++) {
@@ -304,6 +366,7 @@ scenes["player"] = new Scene(
             objects["infoText3"].text = convertSeconds(wggjAudio.currentTime) + " / " + convertSeconds(wggjAudio.duration);
             objects["infoText4"].text = "#" + (playlistP + 1) + " / #" + playlist.length;
         }
+        if (getPlaylist(settings.currentPlaylist)) objects["infoText5"].text = "Playlist: " + getPlaylist(settings.currentPlaylist).name;
 
         //if (document.title === "Lunaudia" && !wggjAudio.paused) {
         //    document.title = currentSong !== "" && objects["infoText2"].text != "" ? objects["infoText2"].text.split(": ")[1] : "Lunaudia";
@@ -313,11 +376,8 @@ scenes["player"] = new Scene(
         objects["progressBarHider"].x = 0.8 - objects["progressBarHider"].w;
         //objects["progressBarHider"].w += (objects["progressBarHider"].w + objects["progressBarHider"].x) % 0.8;
 
-        objects["btnPauseImg"].image = wggjAudio.paused ? "play" : "pause";
-        objects["btnRepeatImg"].image = repeat ? "repeat_on" : "repeat";
-        objects["btnShuffleImg"].image = shuffle ? "shuffle_on" : "shuffle";
-
-        timer = (timer + tick) % 1;
-        objects["promptText"].text = customPrompt.active ? (customPrompt.text + (timer > 0.5 ? "|" : "")) : "";
+        objects["btnPause:image"].image = wggjAudio.paused ? "play" : "pause";
+        objects["btnRepeat:image"].image = repeat ? "repeat_on" : "repeat";
+        objects["btnShuffle:image"].image = shuffle ? "shuffle_on" : "shuffle";
     }
 );

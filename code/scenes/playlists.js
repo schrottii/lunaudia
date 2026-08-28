@@ -14,15 +14,15 @@ scenes["playlists"] = new Scene(
         createText("btnNewText", 0.75, 0.075, "+", { size: 40, color: "white" });
 
         // Back button
-        createButton("btnBack", 0.9, 0, 0.1, 0.1, "button", () => {
+        createButton("btnBack", 0.8, 0, 0.2, 0.1, "button", () => {
             window.lunaudiaAPI.savePlaylists(playlists);
             window.lunaudiaAPI.saveSettings(settings);
             loadScene("player");
-        }, { quadratic: true, centered: true });
-        createText("btnBackText", 0.9, 0.075, "Back", { size: 40, color: "white" });
+        }, {
+            aText: { size: 32, color: "white", text: "< Back" }
+        });
     },
     (tick) => {
         updateListWindow(playlists);
-        objects["promptText"].text = customPrompt.active ? ("New name: " + customPrompt.text + (timer > 0.5 ? "|" : "")) : "";
     }
 );
